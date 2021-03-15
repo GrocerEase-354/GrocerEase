@@ -1,6 +1,6 @@
 CREATE TABLE user (
-    userid INT, 
-    user_password CHAR(100),
+    userid VARCHAR(20), 
+    user_password CHAR(100) NOT NULL,
     house_number INT,
     street_name VARCHAR(100),
     postal_code VARCHAR(20),
@@ -15,7 +15,7 @@ CREATE TABLE user (
 );
 
 CREATE TABLE customer (
-    id INT,
+    id VARCHAR(20),
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     PRIMARY KEY (id),
@@ -23,7 +23,7 @@ CREATE TABLE customer (
 );
 
 CREATE TABLE seller (
-    id INT,
+    id VARCHAR(20),
     company_name VARCHAR(100),
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES user(userid)
@@ -38,8 +38,8 @@ CREATE TABLE product (
     productid INT,
     stock INT,
     product_description VARCHAR(1000),
-    best_before_date DATE,
-    product_name VARCHAR(100),
+    best_before_date DATE NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
     price DECIMAL(10, 2),
     sellerid INT,
     category_name CHAR(100),
@@ -53,7 +53,7 @@ CREATE TABLE product (
 );
 
 CREATE TABLE store_order (
-    customerid INT,
+    customerid VARCHAR(20),
     orderid INT,
     cost DECIMAL(10, 2),
     order_time DATE,
@@ -66,7 +66,7 @@ CREATE TABLE store_order (
 );
 
 CREATE TABLE shopping_cart (
-    customerid INT,
+    customerid VARCHAR(20),
     cartid INT,
     PRIMARY KEY (customerid, cartid),
     FOREIGN KEY (customerid) REFERENCES customer(id),
@@ -75,7 +75,7 @@ CREATE TABLE shopping_cart (
 
 CREATE TABLE product_in_shopping_cart (
     productid INT,
-    customerid INT,
+    customerid VARCHAR(20),
     cartid INT,
     quantity INT,
     PRIMARY KEY (productid, customerid, cartid),
@@ -85,7 +85,7 @@ CREATE TABLE product_in_shopping_cart (
 );
 
 CREATE TABLE adds (
-    customerid INT,
+    customerid VARCHAR(20),
     productid INT,
     PRIMARY KEY (customerid, productid),
     FOREIGN KEY (customerid) REFERENCES customer(id),
@@ -93,7 +93,7 @@ CREATE TABLE adds (
 );
 
 CREATE TABLE customer_payment_method (
-    customerid INT,
+    customerid VARCHAR(20),
     payment_method VARCHAR(100),
     PRIMARY KEY (customerid, payment_method),
     FOREIGN KEY (customerid) REFERENCES customer(id)
