@@ -7,7 +7,11 @@ CREATE TABLE user (
     province VARCHAR(100),
     city VARCHAR(100),
     email VARCHAR(100),
-    PRIMARY KEY (userid)
+    PRIMARY KEY (userid),
+    CONSTRAINT uid_valid CHECK (userid>=0),
+    CONSTRAINT hnum_valid CHECK (house_number>=0),
+    CONSTRAINT password_valid CHECK (LENGTH(user_password)>=1),
+    CONSTRAINT email_valid CHECK (Email REGEXP '^[0-9A-Za-z._-]+@[0-9A-Za-z.-]+\.[a-zA-Z0-9-.]+$')
 );
 
 CREATE TABLE customer (
@@ -41,7 +45,11 @@ CREATE TABLE product (
     category_name CHAR(100),
     PRIMARY KEY (productid),
     FOREIGN KEY (sellerid) REFERENCES seller(id),
-    FOREIGN KEY (category_name) REFERENCES category(category_name)
+    FOREIGN KEY (category_name) REFERENCES category(category_name),
+    CONSTRAINT pid_valid CHECK (productid >= 0),
+    CONSTRAINT stock_valid CHECK (stock >= 0),
+    CONSTRAINT bbdate_valid CHECK (best_before_date > CURRENT_DATE),
+    CONSTRAINT price_valid CHECK (price >= 0.0)
 );
 
 CREATE TABLE store_order (
@@ -51,14 +59,18 @@ CREATE TABLE store_order (
     order_time DATE,
     payment_method_used VARCHAR(100),
     PRIMARY KEY (customerid, orderid),
-    FOREIGN KEY (customerid) REFERENCES customer(id)
+    FOREIGN KEY (customerid) REFERENCES customer(id),
+    CONSTRAINT oid_valid CHECK (orderid>=0),
+    CONSTRAINT cost_valid CHECK (cost>=0.0),
+    CONSTRAINT time_valid CHECK (order_time<=CURRENT_DATE)
 );
 
 CREATE TABLE shopping_cart (
     customerid INT,
     cartid INT,
     PRIMARY KEY (customerid, cartid),
-    FOREIGN KEY (customerid) REFERENCES customer(id)
+    FOREIGN KEY (customerid) REFERENCES customer(id),
+    CONSTRAINT cid_valid CHECK (cartid>=0)
 );
 
 CREATE TABLE product_in_shopping_cart (
@@ -68,7 +80,8 @@ CREATE TABLE product_in_shopping_cart (
     quantity INT,
     PRIMARY KEY (productid, customerid, cartid),
     FOREIGN KEY (productid) REFERENCES product(productid),
-    FOREIGN KEY (customerid, cartid) REFERENCES shopping_cart(customerid, cartid)
+    FOREIGN KEY (customerid, cartid) REFERENCES shopping_cart(customerid, cartid),
+    CONSTRAINT qnty_valid CHECK (quantity>=0)
 );
 
 CREATE TABLE adds (
