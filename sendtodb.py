@@ -29,7 +29,11 @@ def home():
         for i in retVal:
             for j in i:
                 if (request.form['submitbutton'] == str(j)):
-                    clickValue = str(j)
+                    cursor2 = mysql.connection.cursor()
+                    cursor2.execute(f'''SELECT * FROM product WHERE category_name = "{str(j)}"''')
+                    retVal2 = cursor2.fetchall()
+                    cursor2.close()
+                    clickValue = retVal2
                     print(j, file=sys.stderr)
                     return render_template('home.html', homeRetVal = [str(retVal), retVal, clickValue])
     
