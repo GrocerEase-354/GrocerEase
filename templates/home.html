@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}
+Home
+{% endblock title%}
+
+{% block content %}
+    {{homeRetVal[0]}}
+    <br>
+    <form method="post">
+    {% for i in homeRetVal[1] %}
+        {% for j in i %}
+            <button type="submit" name="submitbutton" value="{{ j|string() }}">{{ j|string() }}</button>
+        {% endfor %}
+        <br>
+    {% endfor %}
+    </form>
+
+    <p>Clicked: {{ homeRetVal[2] }}</p>
+{% endblock content %}
