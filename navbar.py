@@ -18,7 +18,8 @@ def goToCategory(selected_category):
         actualSelectedCategory = "%"
     cursor = mysql.connection.cursor()
     productsToSelect = "product_name, price, sellerid, product_description, category_name, best_before_date"
-    cursor.execute(f'''SELECT {productsToSelect} FROM product WHERE LOWER(category_name) LIKE "{actualSelectedCategory}";''')
+    # preventing SQL injection from URL
+    cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
     cursor.close()
     table = []
