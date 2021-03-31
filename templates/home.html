@@ -4,16 +4,16 @@ Home
 {% endblock title%}
 
 {% block content %}
-    {{homeRetVal[0]}}
-    <br>
-    <form method="post">
-    {% for i in homeRetVal[1] %}
-        {% for j in i %}
-            <button type="submit" name="submitbutton" value="{{ j|string() }}">{{ j|string() }}</button>
+    <h1>Home: Select a button to check a specific category</h1>
+    <form method="post" id="buttons">
+    
+    
+        <button type="submit" name="submitbutton" class="inlineBlockButton" value="All">All</button>
+        {% for i in retVal %}
+            {% for j in i %}
+            <button type="submit" name="submitbutton" class="inlineBlockButton" value="{{ j|string() }}">{{ j|string() }}</button>
+            {% endfor %}
+            
         {% endfor %}
-        <br>
-    {% endfor %}
     </form>
-
-    <p>Clicked: {{ homeRetVal[2] }}</p>
 {% endblock content %}
