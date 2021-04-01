@@ -1,3 +1,4 @@
+
 CREATE TABLE user (
     userid VARCHAR(20), 
     user_password CHAR(100) NOT NULL,
@@ -221,11 +222,23 @@ INSERT INTO product VALUES
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
-('Y123','123',2.99,'2021-2-20','Credit Card'),
-('A123','456',3.99,'2021-2-21','Credit Card'),
-('H123','789',4.99,'2021-2-22','Debit Card'),
-('J123','101',2.99,'2021-2-23','Debit Card'),
-('B123','112',5.99,'2021-2-24','Debit Card');
+('Y123','100',2.99,'2021-2-20','Credit Card'),
+('Y123','101',4.99,'2021-2-25','Credit Card'),
+('Y123','102',3.99,'2021-2-26','Credit Card'),
+('Y123','103',2.99,'2021-2-27','Credit Card'),
+
+('A123','104',2.99,'2021-2-20','Credit Card'),
+('A123','105',3.99,'2021-2-21','Credit Card'),
+('A123','106',5.99,'2021-2-28','Credit Card'),
+
+('H123','107',4.99,'2021-2-22','Debit Card'),
+('H123','108',2.99,'2021-2-25','Debit Card'),
+
+('J123','109',2.99,'2021-2-23','Debit Card'),
+('J123','110',2.99,'2021-2-24','Debit Card'),
+
+('B123','111',5.99,'2021-2-24','Debit Card');
+
 
 /*Shopping_cart entries*/
 INSERT INTO shopping_cart VALUE
