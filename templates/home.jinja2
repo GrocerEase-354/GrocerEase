@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "navbar.jinja2" %}
 {% block title %}
 Home
 {% endblock title%}
@@ -8,10 +8,10 @@ Home
     <form method="post" id="buttons">
     
     
-        <button type="submit" name="submitbutton" class="inlineBlockButton" value="All">All</button>
+        <button type="submit" name="submitbutton" class="inlineBlockButton" value="All" class="btn btn-warning">All</button>
         {% for i in retVal %}
             {% for j in i %}
-            <button type="submit" name="submitbutton" class="inlineBlockButton" value="{{ j|string() }}">{{ j|string() }}</button>
+            <button type="submit" name="submitbutton" class="inlineBlockButton" value="{{ j|string() }}" class="btn btn-warning">{{ j|string() }}</button>
             {% endfor %}
             
         {% endfor %}

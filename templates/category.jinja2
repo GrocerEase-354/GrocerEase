@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "navbar.jinja2" %}
 {% block title %}
 {{ selected_category }}
 {% endblock title%}
@@ -8,7 +8,7 @@
 
 <h1>Category Selected: {{ selected_category }}</h1>
 
-<table>
+<table class="table">
     <tr>
         <th>
             Name
@@ -41,7 +41,7 @@
     {% endfor %}
 </table>
 
-<form method="post"><button type="submit" name="submitbutton" value="home">Return back to home</button></form>
+<form method="post"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
 
 
 
