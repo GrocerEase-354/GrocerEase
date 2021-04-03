@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock title %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+    <style>
+        *{margin:10px;}
+    </style>
+    <h1>Hello</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-danger">
+            {{ messages[0] }}</a>.
+        </div>
+    {% endif %}
+    {% endwith %}
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Username" autofocus="" autocomplete="off">
+        <input type="password" name="password" placeholder="Password">
+        <label class="checkbox">
+            <input type="checkbox">
+            Remember me
+        </label>
+        <button name="login" type="submit">Login</button>
+    </form>
+{% endblock %}

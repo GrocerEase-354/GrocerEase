@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}
+    Order finished! 
+{% endblock title %}
+
+{% block content  %}
+    <h1>
+        Order Confirmed
+    </h1>
+    <p>Thank you for ordering with us! Your orderID is {{orderID}}. Timestamped at {{timestamp}}</p>
+    <form method="POST">
+        <button name="home" type="submit">Back to Index</button>
+    </form>
+{% endblock %}

@@ -2,11 +2,56 @@
 <html>
 <head>
     {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>{% block title %}{% endblock %} - My Webpage</title>
+    <title>{% block title %}{% endblock %}</title>
     {% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
 </head>
 <body>
-    <div id="content">{% block content %}{% endblock %}</div>
+    <style>
+      nav{
+        margin: 10px;
+      }
+    </style>
+    {% block navbar %}
+    <div class="col">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('main.home')}}">Home <span class="">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('main.shopping_cart')}}">Shopping Cart</a>
+            </li>
+          {% if not user or not user.userid %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('auth.login')}}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('auth.signup')}}">Sign Up</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('auth.logout')}}">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{url_for('main.profile')}}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">{{user.userid}}</a>
+            </li>
+          {% endif %}
+          </ul>
+        </div>
+      </nav>
+    </div>
+    {% endblock %}
+    {% block content %}{% endblock %}
 </body>
 </html>
