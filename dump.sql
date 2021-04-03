@@ -1,4 +1,3 @@
-
 CREATE TABLE user (
     userid VARCHAR(20), 
     user_password CHAR(100) NOT NULL,
@@ -113,63 +112,137 @@ DELIMITER $$
 
 CREATE TRIGGER `user_insert_constraints` BEFORE INSERT ON `user`
 FOR EACH ROW  
-IF LENGTH(NEW.userid) < 1 OR NEW.house_number < 0 OR LENGTH(NEW.user_password) < 1 OR NEW.email NOT LIKE '%_@__%.__%' 
+IF LENGTH(NEW.userid) < 1 OR LENGTH(NEW.userid) > 20
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User ID must be between 1 and 20 characters!';
+ELSEIF NEW.house_number < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'House number cannot be less than zero!';
+ELSEIF LENGTH(NEW.user_password) < 1 OR LENGTH(NEW.user_password) > 100
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Password must be between 1 and 100 characters!';
+ELSEIF NEW.email NOT LIKE '%_@__%.__%'
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email format!';
 END IF;$$
 
 CREATE TRIGGER `user_update_constraints` BEFORE UPDATE ON `user`
-FOR EACH ROW IF LENGTH(NEW.userid) < 1 OR NEW.house_number < 0 OR LENGTH(NEW.user_password) < 1 OR NEW.email NOT LIKE '%_@__%.__%' 
+FOR EACH ROW IF LENGTH(NEW.userid) < 1 OR LENGTH(NEW.userid) > 20
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User ID must be between 1 and 20 characters!';
+ELSEIF NEW.house_number < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'House number cannot be less than zero!';
+ELSEIF LENGTH(NEW.user_password) < 1 OR LENGTH(NEW.userid) > 20
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Password must be between 1 and 100 characters!';
+ELSEIF NEW.email NOT LIKE '%_@__%.__%'
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email format!';
 END IF;$$
 
 CREATE TRIGGER `product_insert_constraints` BEFORE INSERT ON `product`
-FOR EACH ROW IF NEW.productid < 0 OR NEW.stock < 0 OR NEW.best_before_date <= CURRENT_DATE OR NEW.price < 0.0 
+FOR EACH ROW IF NEW.productid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product ID cannot be less than zero!';
+ELSEIF NEW.stock < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock cannot be less than zero!';
+ELSEIF NEW.best_before_date <= CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product is expired!';
+ELSEIF NEW.price < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Price cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_update_constraints` BEFORE UPDATE ON `product`
-FOR EACH ROW IF NEW.productid < 0 OR NEW.stock < 0 OR NEW.best_before_date <= CURRENT_DATE OR NEW.price < 0.0 
+FOR EACH ROW IF NEW.productid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product ID cannot be less than zero!';
+ELSEIF NEW.stock < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock cannot be less than zero!';
+ELSEIF NEW.best_before_date <= CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product is expired!';
+ELSEIF NEW.price < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Price cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `store_order_insert_constraints` BEFORE INSERT ON `store_order`
-FOR EACH ROW IF NEW.orderid < 0 OR NEW.cost < 0.0 OR NEW.order_time > CURRENT_DATE 
+FOR EACH ROW IF NEW.orderid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order ID cannot be less than zero!';
+ELSEIF NEW.cost < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cost cannot be less than zero!';
+ELSEIF NEW.order_time > CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Date of order is later than today!';
 END IF;$$
 
 CREATE TRIGGER `store_order_update_constraints` BEFORE UPDATE ON `store_order`
-FOR EACH ROW IF NEW.orderid < 0 OR NEW.cost < 0.0 OR NEW.order_time > CURRENT_DATE 
+FOR EACH ROW IF NEW.orderid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order ID cannot be less than zero!';
+ELSEIF NEW.cost < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cost cannot be less than zero!';
+ELSEIF NEW.order_time > CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Date of order is later than today!';
 END IF;$$
 
 CREATE TRIGGER `shopping_cart_update_constraint` BEFORE UPDATE ON `shopping_cart`
 FOR EACH ROW IF NEW.cartid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cart ID cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `shopping_cart_insert_constraint` BEFORE INSERT ON `shopping_cart`
 FOR EACH ROW IF NEW.cartid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cart ID cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_in_shopping_cart_insert_constraints` BEFORE INSERT ON `product_in_shopping_cart`
 FOR EACH ROW IF NEW.quantity < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_in_shopping_cart_update_constraints` BEFORE UPDATE ON `product_in_shopping_cart`
 FOR EACH ROW IF NEW.quantity < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
 DELIMITER ;
 
