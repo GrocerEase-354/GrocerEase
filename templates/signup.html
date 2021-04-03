@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Signup
+{% endblock title %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+    <style>
+        label, input, select, button, h1, .alert{
+            margin: 10px 0 0 10px;
+        }
+    </style>
+    <h1>Sign up</h1>
+    <div class="row">
+        <div style="width: 500px;">
+            <form class="form-inline" action="/signup" method="post">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        {{ messages[0] }}. Go to <a href="{{ url_for('auth.login') }}">login page</a>.
+                    </div>
+                {% endif %}
+                {% endwith %}
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Username" autofocus="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" name="fname" placeholder="First Name">
+                    <input type="text" class="form-control" name="lname" placeholder="Last Name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" name="email" placeholder="Email" id="email">
+                </div>
+                <div class="form-group">
+                    <label>House Number</label>
+                    <input type="text" class="form-control" name="house_number" placeholder="House Number">
+                </div>
+                <div class="form-group">
+                    <label>Street Name</label>
+                    <input type="text" class="form-control" name="street_name" placeholder="Street Name">
+                </div>
+                <div class="form-group">
+                    <label>Postal Code</label>
+                    <input type="text" class="form-control" name="postal_code" placeholder="Postal Code">
+                </div>
+                <div class="form-group">
+                    <label>Province</label>
+                    <select name="province" class="form-select">
+                        <option value="" selected>Choose a province</option>
+                        <option value="British Columbia">BC</option>
+                        <option value="Alberta">AB</option>
+                        <option value="Manitoba">MB</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" class="form-control" name="city" placeholder="City">
+                </div>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="payment_method" class="form-select">
+                        <option value="" selected>Choose a payment method</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Paypal">Paypal</option>
+                    </select>
+                </div>
+                <label class="checkbox">
+                    <input type="checkbox">
+                    Remember me
+                </label>
+                <br>    
+                <button class="btn btn-primary" name="signup" type="submit">Sign up</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

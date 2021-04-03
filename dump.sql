@@ -112,63 +112,137 @@ DELIMITER $$
 
 CREATE TRIGGER `user_insert_constraints` BEFORE INSERT ON `user`
 FOR EACH ROW  
-IF LENGTH(NEW.userid) < 1 OR NEW.house_number < 0 OR LENGTH(NEW.user_password) < 1 OR NEW.email NOT LIKE '%_@__%.__%' 
+IF LENGTH(NEW.userid) < 1 OR LENGTH(NEW.userid) > 20
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User ID must be between 1 and 20 characters!';
+ELSEIF NEW.house_number < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'House number cannot be less than zero!';
+ELSEIF LENGTH(NEW.user_password) < 1 OR LENGTH(NEW.user_password) > 100
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Password must be between 1 and 100 characters!';
+ELSEIF NEW.email NOT LIKE '%_@__%.__%'
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email format!';
 END IF;$$
 
 CREATE TRIGGER `user_update_constraints` BEFORE UPDATE ON `user`
-FOR EACH ROW IF LENGTH(NEW.userid) < 1 OR NEW.house_number < 0 OR LENGTH(NEW.user_password) < 1 OR NEW.email NOT LIKE '%_@__%.__%' 
+FOR EACH ROW IF LENGTH(NEW.userid) < 1 OR LENGTH(NEW.userid) > 20
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User ID must be between 1 and 20 characters!';
+ELSEIF NEW.house_number < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'House number cannot be less than zero!';
+ELSEIF LENGTH(NEW.user_password) < 1 OR LENGTH(NEW.userid) > 20
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Password must be between 1 and 100 characters!';
+ELSEIF NEW.email NOT LIKE '%_@__%.__%'
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email format!';
 END IF;$$
 
 CREATE TRIGGER `product_insert_constraints` BEFORE INSERT ON `product`
-FOR EACH ROW IF NEW.productid < 0 OR NEW.stock < 0 OR NEW.best_before_date <= CURRENT_DATE OR NEW.price < 0.0 
+FOR EACH ROW IF NEW.productid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product ID cannot be less than zero!';
+ELSEIF NEW.stock < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock cannot be less than zero!';
+ELSEIF NEW.best_before_date <= CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product is expired!';
+ELSEIF NEW.price < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Price cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_update_constraints` BEFORE UPDATE ON `product`
-FOR EACH ROW IF NEW.productid < 0 OR NEW.stock < 0 OR NEW.best_before_date <= CURRENT_DATE OR NEW.price < 0.0 
+FOR EACH ROW IF NEW.productid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product ID cannot be less than zero!';
+ELSEIF NEW.stock < 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock cannot be less than zero!';
+ELSEIF NEW.best_before_date <= CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Product is expired!';
+ELSEIF NEW.price < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Price cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `store_order_insert_constraints` BEFORE INSERT ON `store_order`
-FOR EACH ROW IF NEW.orderid < 0 OR NEW.cost < 0.0 OR NEW.order_time > CURRENT_DATE 
+FOR EACH ROW IF NEW.orderid < 0
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order ID cannot be less than zero!';
+ELSEIF NEW.cost < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cost cannot be less than zero!';
+ELSEIF NEW.order_time > CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Date of order is later than today!';
 END IF;$$
 
 CREATE TRIGGER `store_order_update_constraints` BEFORE UPDATE ON `store_order`
-FOR EACH ROW IF NEW.orderid < 0 OR NEW.cost < 0.0 OR NEW.order_time > CURRENT_DATE 
+FOR EACH ROW IF NEW.orderid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order ID cannot be less than zero!';
+ELSEIF NEW.cost < 0.0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cost cannot be less than zero!';
+ELSEIF NEW.order_time > CURRENT_DATE
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Date of order is later than today!';
 END IF;$$
 
 CREATE TRIGGER `shopping_cart_update_constraint` BEFORE UPDATE ON `shopping_cart`
 FOR EACH ROW IF NEW.cartid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cart ID cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `shopping_cart_insert_constraint` BEFORE INSERT ON `shopping_cart`
 FOR EACH ROW IF NEW.cartid < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cart ID cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_in_shopping_cart_insert_constraints` BEFORE INSERT ON `product_in_shopping_cart`
 FOR EACH ROW IF NEW.quantity < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
 
 CREATE TRIGGER `product_in_shopping_cart_update_constraints` BEFORE UPDATE ON `product_in_shopping_cart`
 FOR EACH ROW IF NEW.quantity < 0 
 THEN
-    SIGNAL SQLSTATE '45000';
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
 DELIMITER ;
 
@@ -221,11 +295,23 @@ INSERT INTO product VALUES
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
-('Y123','123',2.99,'2021-2-20','Credit Card'),
-('A123','456',3.99,'2021-2-21','Credit Card'),
-('H123','789',4.99,'2021-2-22','Debit Card'),
-('J123','101',2.99,'2021-2-23','Debit Card'),
-('B123','112',5.99,'2021-2-24','Debit Card');
+('Y123','100',2.99,'2021-2-20','Credit Card'),
+('Y123','101',4.99,'2021-2-25','Credit Card'),
+('Y123','102',3.99,'2021-2-26','Credit Card'),
+('Y123','103',2.99,'2021-2-27','Credit Card'),
+
+('A123','104',2.99,'2021-2-20','Credit Card'),
+('A123','105',3.99,'2021-2-21','Credit Card'),
+('A123','106',5.99,'2021-2-28','Credit Card'),
+
+('H123','107',4.99,'2021-2-22','Debit Card'),
+('H123','108',2.99,'2021-2-25','Debit Card'),
+
+('J123','109',2.99,'2021-2-23','Debit Card'),
+('J123','110',2.99,'2021-2-24','Debit Card'),
+
+('B123','111',5.99,'2021-2-24','Debit Card');
+
 
 /*Shopping_cart entries*/
 INSERT INTO shopping_cart VALUE
