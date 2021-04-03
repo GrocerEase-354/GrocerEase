@@ -177,7 +177,7 @@ def home():
     session['user'] = user
     session['orderID'] = 999
     cursor.close()
-    return render_template("index.html", user=current_user)
+    return render_template("index.jinja2", user=current_user)
 
 @app.route("/shopping_cart", methods=["GET", "POST"])
 @login_required
@@ -200,13 +200,13 @@ def shopping_cart():
     print(products)
     if request.method == "POST":
         if "sc" in request.form:
-            return redirect(url_for(".home"))
+            return redirect(url_for("home"))
         elif "checkout" in request.form:
             if len(products) == 0:
                 flash("No products ordered!")
-                return redirect(url_for(".shopping_cart"))
+                return redirect(url_for("shopping_cart"))
             else:
-                return redirect(url_for(".checkout"))
+                return redirect(url_for("checkout"))
         for p in products:
             #print(f"delete_{p[0]}")
             if f"delete_{p[0]}" in request.form:
@@ -219,7 +219,7 @@ def shopping_cart():
                 mysql.connection.commit()
                 cursor.close()
                 print(f"deleting {p[0]}")
-                return redirect(url_for(".redirect_on_delete"))
+                return redirect(url_for("redirect_on_delete"))
 
     cursor = mysql.connection.cursor() 
     # get the items in the cart
@@ -234,7 +234,7 @@ def shopping_cart():
 @app.route("/redirect")
 @login_required
 def redirect_on_delete():
-    return redirect(url_for(".shopping_cart"))
+    return redirect(url_for("shopping_cart"))
 
 @app.route("/checkout", methods=["GET", "POST"])
 @login_required
@@ -267,10 +267,10 @@ def checkout():
             cursor.execute(f"""DELETE FROM product_in_shopping_cart
                                WHERE customerid='{user.userid}'""")
             mysql.connection.commit()
-            return redirect(url_for(".order_confirmed"))
+            return redirect(url_for("order_confirmed"))
             
         elif "cancel" in request.form:
-            return redirect(url_for(".shopping_cart"))
+            return redirect(url_for("shopping_cart"))
 
     return render_template("checkout.html", user=current_user, subtotal=subtotal, user_dict={
         "Name": current_user.fname + " " + current_user.lname,
@@ -293,7 +293,7 @@ def order_confirmed():
 
     if request.method == "POST":
         if "home" in request.form:
-            return redirect(url_for(".home"))
+            return redirect(url_for("home"))
 
     return render_template("order_confirmed.html", orderID=orderID, timestamp=ts, user=current_user)
 
@@ -307,6 +307,7 @@ def logged_out():
     return render_template("logged_out.html", user=current_user)
 
 @app.route("/category/<selected_category>", methods=['GET', 'POST'])
+@login_required
 def goToCategory(selected_category):
     actualSelectedCategory = selected_category.lower()
     if (actualSelectedCategory == "all"):
@@ -331,42 +332,13 @@ def goToCategory(selected_category):
     else:      
         return render_template("category.jinja2", selected_category=selected_category, retVal=retVal)
 
-
-@app.before_request
-def initNavBar():
-    topbar = Navbar(View("Home", "home"))
-    nav.register_element('topbar', topbar)
-
-    topbar.items.append(View("Shopping Cart", "shopping_cart"))
-
-    if (not current_user.is_authenticated):
-        topbar.items.append(View("Login", "login"))
-        topbar.items.append(View("Sign Up", "signup"))
-    else:
-        topbar.items.append(View("Logout", "logout"))
-        topbar.items.append(View("Profile", "profile"))
-        topbar.items.append(Text(current_user.userid))
-
-
-    topbar.items.append(View("All", "goToCategory", selected_category = "All"))
-
+@app.route("/orders")
+def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute('''SELECT category_name FROM category''')
-    retVal = cursor.fetchall()
-    cursor.close()
-    #topbar.items.append(View("Hello", "home"))
-    
-    for i in retVal:
-        j = ''.join(i)  # to get the string
-        topbar.items.append(View(j, "goToCategory", selected_category = j))
-    
-@app.route("/Orders")
-def Orders():
-    cursor = mysql.get_db().cursor()
     cursor.execute('''SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
     retVal = cursor.fetchall()
     cursor.close()
-    return render_template('OrderHistory.html',orders = retVal)
+    return render_template('orderHistory.jinja2', orders = retVal)
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
@@ -396,6 +368,41 @@ def account():
                 db_connection.commit()
                 flash(f'Changes saved!', 'success')
     return render_template('account.html', title='Account', form=form)
+
+
+@app.before_request
+def initNavBar():
+    topbar = Navbar(View("Home", "home"))
+    nav.register_element('topbar', topbar)
+
+    
+
+    if (not current_user.is_authenticated):
+        topbar.items.append(View("Login", "login"))
+        topbar.items.append(View("Sign Up", "signup"))
+    else:
+        topbar.items.append(View("Logout", "logout"))
+        topbar.items.append(View("Profile", "profile"))
+        topbar.items.append(View("My Account", "account"))
+        topbar.items.append(View("Shopping Cart", "shopping_cart"))
+        topbar.items.append(View("Order History", "orders"))
+        topbar.items.append(Text(current_user.userid))
+        
+        topbar.items.append(View("All", "goToCategory", selected_category = "All"))
+
+        cursor = mysql.connection.cursor()
+        cursor.execute('''SELECT category_name FROM category''')
+        retVal = cursor.fetchall()
+        cursor.close()
+        #topbar.items.append(View("Hello", "home"))
+        
+        for i in retVal:
+            j = ''.join(i)  # to get the string
+            topbar.items.append(View(j, "goToCategory", selected_category = j))
+
+
+    
+    
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)

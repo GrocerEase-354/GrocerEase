@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "navbar.jinja2" %}
 
 {% block title %}
     Signup
@@ -9,14 +9,19 @@
 
 {% block content %}
     <style>
-        label, input, select, button, h1, .alert{
-            margin: 10px 0 0 10px;
+        label, input, select, button, h1, .alert {
+            margin-left: 100px;
+            margin-top: 10px;
+            /*margin: 10px 0 0 100px;*/
         }
+        
     </style>
+
+    <style link=""></style>
     <h1>Sign up</h1>
     <div class="row">
         <div style="width: 500px;">
-            <form class="form-inline" action="/signup" method="post">
+            <form class="form-group" action="/signup" method="post">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <div class="alert alert-danger">
@@ -55,7 +60,7 @@
                 </div>
                 <div class="form-group">
                     <label>Province</label>
-                    <select name="province" class="form-select">
+                    <select name="province" class="form-control">
                         <option value="" selected>Choose a province</option>
                         <option value="British Columbia">BC</option>
                         <option value="Alberta">AB</option>
@@ -68,19 +73,21 @@
                 </div>
                 <div class="form-group">
                     <label>Payment Method</label>
-                    <select name="payment_method" class="form-select">
+                    <select name="payment_method" class="form-control">
                         <option value="" selected>Choose a payment method</option>
                         <option value="Credit Card">Credit Card</option>
                         <option value="Debit Card">Debit Card</option>
                         <option value="Paypal">Paypal</option>
                     </select>
                 </div>
-                <label class="checkbox">
-                    <input type="checkbox">
-                    Remember me
-                </label>
-                <br>    
-                <button class="btn btn-primary" name="signup" type="submit">Sign up</button>
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox">
+                        Remember me
+                    </label>
+                    <button class="btn btn-primary" name="signup" type="submit">Sign up</button>
+                    
+                </div>
             </form>
         </div>
     </div>
