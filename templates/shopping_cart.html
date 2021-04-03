@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Shopping Cart!
+{% endblock title %}
+
+{% block content %}
+    <form method="POST">
+        <button name="sc" type="submit">Back to Index</button>
+    </form>
+    <h1>
+        {{user.fname + " " + user.lname}}'s Shopping Cart
+    </h1>
+    <table>
+        <thead>
+            <tr>
+                <td>Item Name</td>
+                <td>Quantity</td>
+                <td>Price</td>
+                <td>Total Price</td>
+                <td></td>
+            </tr>
+        </thead>
+        {% for pname, qty, price, totalPrice in items %}
+            <tr>
+                <td>{{pname}}</td>
+                <td>{{qty}}</td>
+                <td>{{price}}</td>
+                <td>{{totalPrice}}</td>
+                <td><form autocomplete="off" method="POST"><button name="delete_{{pname}}" type="submit">Delete</button></form></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+    Subtotal: {{"$%.2f"|format(subtotal)}} <br>
+    Taxes: {{"$%.2f"|format(subtotal|float()*0.12)}} <br>
+    Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
+    <form method="post">
+        <button name="checkout" type="submit">Proceed To Checkout</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="notification is-danger">
+            {{ messages[0] }}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+{% endblock content %}

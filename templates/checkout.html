@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}
+    Checkout
+{% endblock title %}
+
+{% block content  %}
+<h1>
+    Order Summary
+</h1>
+Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
+<h3>
+    Confirm Details
+</h3>   
+
+<table>
+    {% for name in user_dict %}
+    <tr>
+        <td>{{name}}:</td>
+        <td>{{user_dict[name]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<form method="POST">
+    <button name="confirm" type="submit">Confirm</button>
+</form>
+<form method="POST">
+    <button name="cancel" type="submit">Cancel</button>
+</form>
+{% endblock content %}
