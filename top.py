@@ -381,25 +381,28 @@ def initNavBar():
         topbar.items.append(View("Login", "login"))
         topbar.items.append(View("Sign Up", "signup"))
     else:
-        topbar.items.append(View("Logout", "logout"))
-        topbar.items.append(View("Profile", "profile"))
-        topbar.items.append(View("My Account", "account"))
-        topbar.items.append(View("Shopping Cart", "shopping_cart"))
-        topbar.items.append(View("Order History", "orders"))
-        topbar.items.append(Text(current_user.userid))
-        
-        topbar.items.append(View("All", "goToCategory", selected_category = "All"))
 
         cursor = mysql.connection.cursor()
         cursor.execute('''SELECT category_name FROM category''')
         retVal = cursor.fetchall()
         cursor.close()
         #topbar.items.append(View("Hello", "home"))
-        
+        items = []
+        items.append(View("All", "goToCategory", selected_category = "All"))
         for i in retVal:
             j = ''.join(i)  # to get the string
-            topbar.items.append(View(j, "goToCategory", selected_category = j))
+            items.append(View(j, "goToCategory", selected_category = j))
+        topbar.items.append(Subgroup("Categories", *items))
 
+        topbar.items.append(View("Shopping Cart", "shopping_cart"))
+        topbar.items.append(View("Order History", "orders"))
+        
+
+        topbar.items.append(Text("Logged in as " + current_user.userid))
+        topbar.items.append(View("Logout", "logout"))
+        topbar.items.append(View("Profile", "profile"))
+        topbar.items.append(View("My Account", "account"))
+    
 
     
     
