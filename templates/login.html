@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "navbar.jinja2" %}
 
 {% block title %}
     Login
@@ -20,12 +20,15 @@
     {% endif %}
     {% endwith %}
     <form action="/login" method="post">
-        <input type="text" name="username" placeholder="Username" autofocus="" autocomplete="off">
-        <input type="password" name="password" placeholder="Password">
+        <div class="form-group" style="width: 500px;">
+            <input type="text" class="form-control" name="username" placeholder="Username" autofocus="" autocomplete="off">
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        
         <label class="checkbox">
             <input type="checkbox">
             Remember me
         </label>
-        <button name="login" type="submit">Login</button>
+        <button name="login" class="btn btn-primary" type="submit">Login</button>
     </form>
 {% endblock %}
