@@ -9,7 +9,7 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_HOST'] = '10.0.2.2'
 app.config['MYSQL_DB'] = 'cmpt354'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+#app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
@@ -25,19 +25,21 @@ def account():
         for field in form:
             if field.data != None:
                 if field.name == 'first_name' or field.name == 'last_name':
-                    query = "UPDATE customer SET %s = %s WHERE id = 'H123'"
-                elif field.name == 'house_number':
-                    query = "UPDATE user SET %s = %d WHERE id = 'H123'"
+                    db_cursor.execute('''
+                                            UPDATE customer
+                                            SET {} = %s
+                                            WHERE id = 'H123'
+                                      '''.format(field.name) ,
+                                      (field.data,))
                 else:
-                    query = "UPDATE user SET %s = %s WHERE id = 'H123'"
-                
-                cursor2.execute(f'''SELECT * FROM product WHERE category_name = "{str(j)}"''')
-                data = (field.name, field.data)
-
-                db_cursor.execute(query, data)
+                    db_cursor.execute('''
+                                            UPDATE user
+                                            SET {} = %s
+                                            WHERE userid = 'H123'
+                                      '''.format(field.name) ,
+                                      (field.data,))
+                                      
                 db_connection.commit()
-                db_cursor.close()
-
                 flash(f'Changes saved!', 'success')
     return render_template('account.html', title='Account', form=form)
 
