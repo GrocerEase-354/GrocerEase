@@ -21,6 +21,24 @@ def account():
     if form.validate_on_submit():
         db_connection = mysql.connection
         db_cursor = db_connection.cursor()
+        
+        for field in form:
+            if field.data != None:
+                if field.name == 'first_name' or field.name == 'last_name':
+                    query = "UPDATE customer SET %s = %s WHERE id = 'H123'"
+                elif field.name == 'house_number':
+                    query = "UPDATE user SET %s = %d WHERE id = 'H123'"
+                else:
+                    query = "UPDATE user SET %s = %s WHERE id = 'H123'"
+                
+                cursor2.execute(f'''SELECT * FROM product WHERE category_name = "{str(j)}"''')
+                data = (field.name, field.data)
+
+                db_cursor.execute(query, data)
+                db_connection.commit()
+                db_cursor.close()
+
+                flash(f'Changes saved!', 'success')
     return render_template('account.html', title='Account', form=form)
 
 if __name__ == '__main__':
