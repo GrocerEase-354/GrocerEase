@@ -18,7 +18,7 @@ bootstrap = Bootstrap(app)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'cmpt354'
 app.config['SECRET_KEY'] = 'test'
 
@@ -333,12 +333,19 @@ def goToCategory(selected_category):
         return render_template("category.jinja2", selected_category=selected_category, retVal=retVal)
 
 @app.route("/orders")
+@login_required
 def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute('''SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
+    cursor.execute(f"""SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  
+                        FROM store_order, customer,product 
+                        WHERE customer.id = store_order.customerid AND store_order.cost = product.price AND store_order.customerid = '{current_user.userid}'""")
     retVal = cursor.fetchall()
+    cursor.execute(f""" SELECT COUNT(*)
+                        FROM store_order, customer,product 
+                        WHERE customer.id = store_order.customerid AND store_order.cost = product.price AND store_order.customerid = '{current_user.userid}'""")
+    numOrders = cursor.fetchone()
     cursor.close()
-    return render_template('orderHistory.jinja2', orders = retVal)
+    return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
