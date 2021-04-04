@@ -89,7 +89,7 @@ def signup():
 #    return render_template('Logout')
 
 @app.route('/signup', methods=['POST'])
-def signup_post(    ):
+def signup_post():
     username = request.form.get('username')
     fname = request.form.get('fname')
     lname = request.form.get('lname')
