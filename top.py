@@ -336,13 +336,13 @@ def goToCategory(selected_category):
 @login_required
 def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute(f"""SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  
-                        FROM store_order, customer,product 
-                        WHERE customer.id = store_order.customerid AND store_order.cost = product.price AND store_order.customerid = '{current_user.userid}'""")
+    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used  
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
     retVal = cursor.fetchall()
     cursor.execute(f""" SELECT COUNT(*)
-                        FROM store_order, customer,product 
-                        WHERE customer.id = store_order.customerid AND store_order.cost = product.price AND store_order.customerid = '{current_user.userid}'""")
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
     numOrders = cursor.fetchone()
     cursor.close()
     return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
