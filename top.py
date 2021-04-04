@@ -370,7 +370,7 @@ def goToCategory(selected_category):
             return redirect(url_for("home"))
         else:
             cursor2 = mysql.connection.cursor()
-            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{ current_user.userid }'")
+            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{current_user.userid}'")
             cartid = cursor2.fetchall()[0][0]
 
             checkexist = f"SELECT productid, customerid, cartid FROM product_in_shopping_cart WHERE productid='{request.form['submitbutton']}' AND customerid='{ current_user.userid }' AND cartid = '{ cartid }' "
@@ -450,13 +450,7 @@ def initNavBar():
     else:
         cursor = mysql.connection.cursor()
         cursor.execute(f"""SELECT COUNT(*) FROM product_in_shopping_cart WHERE customerid='{current_user.userid}'""")
-        items = cursor.fetchall()[0][0]
-        topbar.items.append(View("Logout", "logout"))
-        topbar.items.append(View("Profile", "profile"))
-        topbar.items.append(View("My Account", "account"))
-        topbar.items.append(View(f"Shopping Cart{'' if not items or int(items) <= 0 else f' ({items})'}", "shopping_cart"))
-        topbar.items.append(View("Order History", "orders"))
-        topbar.items.append(Text(current_user.userid))
+        shopping_cart_items_count = cursor.fetchall()[0][0]
 
         cursor.execute('''SELECT category_name FROM category''')
         retVal = cursor.fetchall()
@@ -470,7 +464,7 @@ def initNavBar():
             items.append(View(j, "goToCategory", selected_category = j))
         topbar.items.append(Subgroup("Categories", *items))
 
-        topbar.items.append(View("Shopping Cart", "shopping_cart"))
+        topbar.items.append(View(f"Shopping Cart{'' if not shopping_cart_items_count or int(shopping_cart_items_count) <= 0 else f' ({shopping_cart_items_count})'}", "shopping_cart"))
         topbar.items.append(View("Order History", "orders"))
 
 
