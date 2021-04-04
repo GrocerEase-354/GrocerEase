@@ -1,3 +1,16 @@
+DROP TABLE IF EXISTS customer_payment_method;
+DROP TABLE IF EXISTS store_order;
+DROP TABLE IF EXISTS adds;
+DROP TABLE IF EXISTS product_in_shopping_cart;
+DROP TABLE IF EXISTS shopping_cart;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS seller;
+DROP TABLE IF EXISTS user;
+
+
+
 CREATE TABLE user (
     userid VARCHAR(20), 
     user_password CHAR(100) NOT NULL,
@@ -35,7 +48,7 @@ CREATE TABLE category (
 );
 
 CREATE TABLE product (
-    productid INT,
+    productid INT AUTO_INCREMENT,
     stock INT,
     product_description VARCHAR(1000),
     best_before_date DATE NOT NULL,
@@ -109,6 +122,23 @@ CREATE TABLE customer_payment_method (
 );
 
 DELIMITER $$
+
+CREATE TRIGGER OrderIdGeneration BEFORE INSERT ON store_order
+FOR EACH ROW
+    IF NEW.orderid IS NULL
+    THEN  SET NEW.orderid = (
+          SELECT MAX(orderid)
+          FROM store_order) + 1;
+    END IF;
+
+CREATE TRIGGER CartIdGeneration BEFORE INSERT ON shopping_cart
+FOR EACH ROW
+    IF NEW.cartid IS NULL
+    THEN  SET NEW.cartid = (
+          SELECT MAX(cartid)
+          FROM shopping_cart) + 1;
+    END IF;
+
 
 CREATE TRIGGER `user_insert_constraints` BEFORE INSERT ON `user`
 FOR EACH ROW  
@@ -287,11 +317,11 @@ INSERT INTO category VALUES
 
 /*Product table entries*/
 INSERT INTO product VALUES
-(100,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
-(101,5,'A dozen fresh Apples.','2021-04-24','Apple',3.99,'Jim123','Fruits'),
-(102,5,'A bunch of fresh Grapes.','2021-04-24','Grape',4.99,'Jim123','Fruits'),
-(103,5,'A box of fresh Oranges.','2021-04-24','Orange',5.99,'Jim123','Fruits'),
-(104,5,'A box of fresh Peaches.','2021-04-24','Peach',6.99,'Jim123','Fruits'),
+(101,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
+(102,5,'A dozen fresh Apples.','2021-04-24','Apple',3.99,'Jim123','Fruits'),
+(103,5,'A bunch of fresh Grapes.','2021-04-24','Grape',4.99,'Jim123','Fruits'),
+(104,5,'A box of fresh Oranges.','2021-04-24','Orange',5.99,'Jim123','Fruits'),
+(105,5,'A box of fresh Peaches.','2021-04-24','Peach',6.99,'Jim123','Fruits'),
 
 (106,5,'A dozen fresh Beetroots.','2021-4-25','Beet',7.99,'Dwight456','Vegetables'),
 (107,5,'A dozen fresh Carrots.','2021-4-25','Carrot',8.99,'Dwight456','Vegetables'),
@@ -319,48 +349,48 @@ INSERT INTO product VALUES
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
-('Y123','100',2.99,'2021-2-20','Credit Card'),
-('Y123','101',4.99,'2021-2-25','Credit Card'),
-('Y123','102',3.99,'2021-2-26','Credit Card'),
-('Y123','103',2.99,'2021-2-27','Credit Card'),
+('Y123',100,2.99,'2021-2-20','Credit Card'),
+('Y123',101,4.99,'2021-2-25','Credit Card'),
+('Y123',102,3.99,'2021-2-26','Credit Card'),
+('Y123',103,2.99,'2021-2-27','Credit Card'),
 
-('A123','104',2.99,'2021-2-20','Credit Card'),
-('A123','105',3.99,'2021-2-21','Credit Card'),
-('A123','106',5.99,'2021-2-28','Credit Card'),
+('A123',104,2.99,'2021-2-20','Credit Card'),
+('A123',105,3.99,'2021-2-21','Credit Card'),
+('A123',106,5.99,'2021-2-28','Credit Card'),
 
-('H123','107',4.99,'2021-2-22','Debit Card'),
-('H123','108',2.99,'2021-2-25','Debit Card'),
+('H123',107,4.99,'2021-2-22','Debit Card'),
+('H123',108,2.99,'2021-2-25','Debit Card'),
 
-('J123','109',2.99,'2021-2-23','Debit Card'),
-('J123','110',2.99,'2021-2-24','Debit Card'),
+('J123',109,2.99,'2021-2-23','Debit Card'),
+('J123',110,2.99,'2021-2-24','Debit Card'),
 
-('B123','111',5.99,'2021-2-24','Debit Card'),
-('B123','112',1.99,'2021-2-25','Debit Card');
+('B123',111,5.99,'2021-2-24','Debit Card'),
+('B123',112,1.99,'2021-2-25','Debit Card');
 
 
 /*Shopping_cart entries*/
-INSERT INTO shopping_cart VALUE
-    ('Y123',123),
-    ('A123',456),
-    ('H123',789),
-    ('J123',101),
-    ('B123',112);
+INSERT INTO shopping_cart VALUES
+    ('Y123',200),
+    ('A123',201),
+    ('H123',202),
+    ('J123',203),
+    ('B123',204);
 
 /*product_in_shopping_cart*/
 INSERT INTO product_in_shopping_cart VALUES
-    (101,'Y123',123,2),
-    (125,'A123',456,2),
-    (103,'H123',789,2),
-    (104,'J123',101,2),
-    (106,'B123',112,2);
+    (101,'Y123',200,2),
+    (102,'A123',201,2),
+    (103,'H123',202,2),
+    (104,'J123',203,2),
+    (105,'B123',204,2);
 
 /*Adds entries*/
 INSERT INTO adds VALUES
 ('Y123', 101),
-('A123',125),
+('A123',102),
 ('H123',103),
 ('J123',104),
-('B123',106);
+('B123',105);
 
 /*customer_payment_method entries*/
 INSERT INTO customer_payment_method VAlUES
