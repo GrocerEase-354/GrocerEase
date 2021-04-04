@@ -5,3 +5,24 @@
 #buttons {
     width:100%;
 }
+
+.mainContent {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.rainbow-text {
+    background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);   -webkit-background-clip: text;
+    color: transparent;
+}
+
+.logo-colour {
+    background-image: linear-gradient(to left, #CC0633, #84fa9a, blue);   -webkit-background-clip: text;
+    color: transparent;
+}
+
+.navbar {
+    background-image: linear-gradient(to right, #ffce85, #85daff, #CC0633);
+    color: black;
+}
+

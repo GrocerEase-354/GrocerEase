@@ -5,12 +5,7 @@
 {% endblock title %}
 
 {% block content %}
-    <style>
-        .rainbow-text {
-            background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);   -webkit-background-clip: text;
-            color: transparent;
-        }
-    </style>
+<div class="mainContent">
 
     <h1>
         {{user.fname + " " + user.lname}}'s Shopping Cart
@@ -57,4 +52,5 @@
     {% endif %}
     {% endwith %}
 
+</div>
 {% endblock content %}
