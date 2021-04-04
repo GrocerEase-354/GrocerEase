@@ -138,6 +138,9 @@ def signup_post():
                         VALUES('{username}', '{fname}', '{lname}')""")
         cursor.execute(f"""INSERT INTO customer_payment_method (customerid, payment_method)
                         VALUES('{username}', '{payment_method}')""")
+        # add cart to DB
+        cursor.execute(f"""INSERT INTO shopping_cart (customerid)
+                           VALUES('{username}')""")
         mysql.connection.commit()
 
     except MySQLdb.OperationalError as e:
@@ -290,16 +293,10 @@ def checkout():
 
             cursor = mysql.connection.cursor()
 
-            cursor.execute(f"""SELECT orderid FROM store_order GROUP BY orderid ORDER BY orderid DESC""")
-
-            orderID = cursor.fetchall()[0][0]+1
-
             subtotal = session['subtotal']
 
-            print(orderID)
-
-            cursor.execute(f"""INSERT INTO store_order (`customerid`, `orderid`, `cost`, `order_time`, `payment_method_used`)
-                            VALUES ('{user.userid}', {orderID}, {subtotal*1.12}, '{ts}', '{user.payment_method}')""")
+            cursor.execute(f"""INSERT INTO store_order (`customerid`, `cost`, `order_time`, `payment_method_used`)
+                            VALUES ('{user.userid}', {subtotal*1.12}, '{ts}', '{user.payment_method}')""")
             mysql.connection.commit()
 
             cursor.execute(f"""DELETE FROM product_in_shopping_cart
@@ -327,7 +324,11 @@ def order_confirmed():
     # TODO: Fix orderID incrementing
     ts = date.today()
 
-    orderID = session['orderID']
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"""SELECT MAX(orderid)
+                    FROM store_order
+                    WHERE customerid='{current_user.userid}'""") 
+    orderID = cursor.fetchall()[0][0]
 
     if request.method == "POST":
         if "home" in request.form:
