@@ -24,24 +24,24 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('main.home')}}">Home <span class="">(current)</span></a>
+              <a class="nav-link" href="{{url_for('home')}}">Home <span class="">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('main.shopping_cart')}}">Shopping Cart</a>
+              <a class="nav-link" href="{{url_for('shopping_cart')}}">Shopping Cart</a>
             </li>
           {% if not user or not user.userid %}
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('auth.login')}}">Login</a>
+              <a class="nav-link" href="{{url_for('login')}}">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('auth.signup')}}">Sign Up</a>
+              <a class="nav-link" href="{{url_for('signup')}}">Sign Up</a>
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('auth.logout')}}">Logout</a>
+              <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{url_for('main.profile')}}">Profile</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">{{user.userid}}</a>
