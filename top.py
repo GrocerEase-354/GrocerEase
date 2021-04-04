@@ -216,7 +216,7 @@ def shopping_cart():
     user = current_user
 
     # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
+    cursor.execute(f'''SELECT P.product_name, P.productid, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
                        FROM product_in_shopping_cart AS PSC, product AS P 
                        WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
     products = cursor.fetchall()
@@ -238,25 +238,14 @@ def shopping_cart():
                 return redirect(url_for("checkout"))
         for p in products:
             #print(f"delete_{p[0]}")
-            if f"delete_{p[0]}" in request.form:
+            if f"delete_{p[1]}" in request.form:
                 cursor = mysql.connection.cursor()
                 cursor.execute(f'''DELETE FROM product_in_shopping_cart
-                                   WHERE customerid="{user.userid}" AND productid IN (
-                                       SELECT productid
-                                       FROM product
-                                       WHERE product_name="{p[0]}");''')
+                                   WHERE customerid="{user.userid}" AND productid = '{p[1]}';''')
                 mysql.connection.commit()
                 cursor.close()
-                print(f"deleting {p[0]}")
+                print(f"deleting {p[1]}")
                 return redirect(url_for("redirect_on_delete"))
-
-    cursor = mysql.connection.cursor() 
-    # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
-                       FROM product_in_shopping_cart AS PSC, product AS P 
-                       WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
-    products = cursor.fetchall()
-    cursor.close()
 
     return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user)
 
