@@ -272,7 +272,7 @@ INSERT INTO customer VALUES
 /*Seller Table Entries*/
 INSERT INTO seller VALUES
 ('Jim123','Company 1'),
-('Dwight456','Dunder Miflin'),
+('Dwight456','Dunder Mifflin'),
 ('Pam789','Company 2'),
 ('Micheal101','Company 3'),
 ('Mose112','Company 4');
@@ -288,10 +288,10 @@ INSERT INTO category VALUES
 /*Product table entries*/
 INSERT INTO product VALUES
 (123,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
-(456,5,'A dozen fresh Carrots.','2021-4-25','Carrot',4.99,'Dwight456','Vegetables'),
-(789,5,'A fresh jug of milk.','2021-4-26','Milk',3.99,'Pam789','Dairy'),
+(456,5,'A dozen fresh Beetroots.','2021-4-25','Beets',4.99,'Dwight456','Vegetables'),
+(789,5,'A fresh jug of milk.','2021-4-26','Milk',1.99,'Pam789','Dairy'),
 (101,5,'A whole chicken.','2021-4-24','Chicken',5.99,'Micheal101','Meat'),
-(112,5,'A fresh loaf of Bread.','2021-4-24','Bread',2.99,'Mose112','Bread');
+(112,5,'A fresh loaf of Bread.','2021-4-24','Bread',3.99,'Mose112','Bread');
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
@@ -310,7 +310,8 @@ INSERT INTO store_order VALUES
 ('J123','109',2.99,'2021-2-23','Debit Card'),
 ('J123','110',2.99,'2021-2-24','Debit Card'),
 
-('B123','111',5.99,'2021-2-24','Debit Card');
+('B123','111',5.99,'2021-2-24','Debit Card'),
+('B123','112',1.99,'2021-2-25','Debit Card');
 
 
 /*Shopping_cart entries*/
