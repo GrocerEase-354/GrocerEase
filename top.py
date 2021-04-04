@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import date
-from useraccountforms import CustomerAccountForm, SellerAccountForm
+from useraccountforms import CustomerNameForm, SellerCompanyNameForm, PasswordForm, EmailForm, AddressForm, PaymentMethodForm, CustomerAccountForm, SellerAccountForm
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, Optional
