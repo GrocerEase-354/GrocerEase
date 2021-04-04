@@ -5,13 +5,26 @@
 {% endblock title %}
 
 {% block content %}
+    <style>
+        .rainbow-text {
+            background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);   -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
     <form method="POST">
         <button name="sc" type="submit">Back to Index</button>
     </form>
     <h1>
         {{user.fname + " " + user.lname}}'s Shopping Cart
     </h1>
+
+
+    {% if isHealthyChoice %}
+    <h2>🥑<span class="rainbow-text">Healthy Choice!</span>🌶️</h2>
+    {% endif %}
+
     <table class="table">
+
         <thead>
             <tr>
                 <td>Item Name</td>
