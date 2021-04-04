@@ -8,9 +8,11 @@ from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import date
 from useraccountforms import CustomerAccountForm, SellerAccountForm
+from login_signup_forms import LoginForm, SignupForm
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, Optional
+import MySQLdb
 
 app = Flask(__name__)
 
@@ -19,7 +21,7 @@ bootstrap = Bootstrap(app)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'cmpt354'
+app.config['MYSQL_DB'] = 'onlinegrocery'
 app.config['SECRET_KEY'] = 'test'
 
 mysql = MySQL(app)
@@ -75,7 +77,8 @@ def load_user(user_id):
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    login_form = LoginForm()
+    return render_template('login.html', form=login_form)
 
 @app.route('/signup')
 def signup():
@@ -126,16 +129,30 @@ def signup_post():
     )
 
     #session['user'] = user_obj
+    try:
+        # add user to DB
+        cursor.execute(f"""INSERT INTO user (`userid`, `user_password`, `house_number`, `street_name`, `postal_code`, `province`, `city`, `email`)
+                        VALUES('{username}', '{generate_password_hash(password, method='sha256')}', '{house_number}', '{street_name}', '{postal_code}', '{province}', '{city}', '{email}')""")
+        # add customer to DB
+        cursor.execute(f"""INSERT INTO customer (id, first_name, last_name)
+                        VALUES('{username}', '{fname}', '{lname}')""")
+        cursor.execute(f"""INSERT INTO customer_payment_method (customerid, payment_method)
+                        VALUES('{username}', '{payment_method}')""")
+        mysql.connection.commit()
 
-    # add user to DB
-    cursor.execute(f"""INSERT INTO user (`userid`, `user_password`, `house_number`, `street_name`, `postal_code`, `province`, `city`, `email`)
-                       VALUES('{username}', '{generate_password_hash(password, method='sha256')}', '{house_number}', '{street_name}', '{postal_code}', '{province}', '{city}', '{email}')""")
-    # add customer to DB
-    cursor.execute(f"""INSERT INTO customer (id, first_name, last_name)
-                       VALUES('{username}', '{fname}', '{lname}')""")
-    cursor.execute(f"""INSERT INTO customer_payment_method (customerid, payment_method)
-                       VALUES('{username}', '{payment_method}')""")
-    mysql.connection.commit()
+    except MySQLdb.OperationalError as e:
+        print(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
+        flash(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
+        return render_template("signup.html", username=username,
+                                            house_number=house_number,
+                                            street_name=street_name,
+                                            postal_code=postal_code,
+                                            city=city,
+                                            email=email,
+                                            fname=fname,
+                                            lname=lname)
+
+
     cursor.close()
 
     # code to validate and add user to database goes here
@@ -143,23 +160,35 @@ def signup_post():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    remember = True if request.form.get('remember') else False
+    login_form = LoginForm()
+    if login_form.validate_on_submit(): 
+        username = ""
+        password = ""
+        for field in login_form:
+            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
+                if field.name == 'username':
+                    username = field.data
+                elif field.name == 'password':
+                    password = field.data
+        remember = True if request.form.get('remember') else False
 
-    cursor = mysql.connection.cursor()
-    # see if user is in DB
-    cursor.execute(f"""SELECT * FROM user WHERE userid='{username}'""")
-    user = cursor.fetchall()
-    cursor.close()
-    print(user)
-    if not user or (not check_password_hash(user[0][1], password) and user[0][1] != password): # if a user is found, we want to redirect back to signup page so user can try again
-        flash("Username/Password is invalid")
-        return redirect(url_for('login'))
-    user2 = create_user(user[0][0])
-    print("Jello")
-    login_user(user2, remember=remember)
-    return redirect(url_for('profile'))
+        cursor = mysql.connection.cursor()
+        # see if user is in DB
+        cursor.execute(f"""SELECT * FROM user WHERE userid='{username}'""")
+        user = cursor.fetchall()
+        cursor.close()
+        print(user)
+        if not user or (not check_password_hash(user[0][1], password) and user[0][1] != password): # if a user is found, we want to redirect back to signup page so user can try again
+            flash("Username/Password is invalid")
+            return redirect(url_for('login'))
+        user2 = create_user(user[0][0])
+        print("Jello")
+        login_user(user2, remember=remember)
+        return redirect(url_for('profile'))
+
+    return render_template('login.html', form=login_form)
+
+
 
 @app.route('/logout')
 @login_required
@@ -187,7 +216,7 @@ def shopping_cart():
     user = current_user
 
     # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
+    cursor.execute(f'''SELECT P.product_name, P.productid, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
                        FROM product_in_shopping_cart AS PSC, product AS P 
                        WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
     products = cursor.fetchall()
@@ -209,17 +238,15 @@ def shopping_cart():
                 return redirect(url_for("checkout"))
         for p in products:
             #print(f"delete_{p[0]}")
-            if f"delete_{p[0]}" in request.form:
+            if f"delete_{p[1]}" in request.form:
                 cursor = mysql.connection.cursor()
                 cursor.execute(f'''DELETE FROM product_in_shopping_cart
-                                   WHERE customerid="{user.userid}" AND productid IN (
-                                       SELECT productid
-                                       FROM product
-                                       WHERE product_name="{p[0]}");''')
+                                   WHERE customerid="{user.userid}" AND productid = '{p[1]}';''')
                 mysql.connection.commit()
                 cursor.close()
-                print(f"deleting {p[0]}")
+                print(f"deleting {p[1]}")
                 return redirect(url_for("redirect_on_delete"))
+
 
     cursor = mysql.connection.cursor() 
     # get the items in the cart
@@ -247,6 +274,7 @@ def shopping_cart():
     cursor.close()
 
     return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
+
 
 @app.route("/redirect")
 @login_required
@@ -358,7 +386,7 @@ def goToCategory(selected_category):
             return redirect(url_for("home"))
         else:
             cursor2 = mysql.connection.cursor()
-            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{ current_user.userid }'")
+            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{current_user.userid}'")
             cartid = cursor2.fetchall()[0][0]
 
             checkexist = f"SELECT productid, customerid, cartid FROM product_in_shopping_cart WHERE productid='{request.form['submitbutton']}' AND customerid='{ current_user.userid }' AND cartid = '{ cartid }' "
@@ -385,9 +413,12 @@ def goToCategory(selected_category):
         return render_template("category.jinja2", selected_category=selected_category, retVal=retVal)
 
 @app.route("/orders")
+@login_required
 def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute('''SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
+    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used 
+                      FROM store_order, customer
+                      WHERE customer.id = store_order.customerid AND customer.id = '{current_user.userid}'""")
     retVal = cursor.fetchall()
     cursor.close()
     return render_template('orderHistory.jinja2', orders = retVal)
@@ -433,8 +464,10 @@ def initNavBar():
         topbar.items.append(View("Login", "login"))
         topbar.items.append(View("Sign Up", "signup"))
     else:
-
         cursor = mysql.connection.cursor()
+        cursor.execute(f"""SELECT SUM(quantity) AS total_items FROM product_in_shopping_cart WHERE customerid='{current_user.userid}'""")
+        shopping_cart_items_count = cursor.fetchall()[0][0]
+
         cursor.execute('''SELECT category_name FROM category''')
         retVal = cursor.fetchall()
         cursor.close()
@@ -447,9 +480,9 @@ def initNavBar():
             items.append(View(j, "goToCategory", selected_category = j))
         topbar.items.append(Subgroup("Categories", *items))
 
-        topbar.items.append(View("Shopping Cart", "shopping_cart"))
+        topbar.items.append(View(f"Shopping Cart{'' if not shopping_cart_items_count or int(shopping_cart_items_count) <= 0 else f' ({shopping_cart_items_count})'}", "shopping_cart"))
         topbar.items.append(View("Order History", "orders"))
-        
+
 
         topbar.items.append(Text("Logged in as " + current_user.userid))
         topbar.items.append(View("Logout", "logout"))

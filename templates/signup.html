@@ -24,14 +24,20 @@
             <form class="form-group" action="/signup" method="post">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <div class="alert alert-danger">
-                        {{ messages[0] }}. Go to <a href="{{ url_for('login') }}">login page</a>.
-                    </div>
+                    {% for message in messages %}
+                        <div class="alert alert-danger">
+                            {% if message[-1] == '!' %}
+                                {{ message }}
+                            {% else %}
+                                {{ message }}. Go to <a href="{{ url_for('login') }}">login page</a>.
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 {% endif %}
                 {% endwith %}
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" class="form-control" name="username" placeholder="Username" autofocus="" autocomplete="off">
+                    <input type="text" class="form-control" name="username" placeholder="Username" autofocus="" autocomplete="off" value={{username}}>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -39,24 +45,24 @@
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" class="form-control" name="fname" placeholder="First Name">
-                    <input type="text" class="form-control" name="lname" placeholder="Last Name">
+                    <input type="text" class="form-control" name="fname" placeholder="First Name" value={{fname}}>
+                    <input type="text" class="form-control" name="lname" placeholder="Last Name" value={{lname}}>
                 </div>
                 <div class="form-group">
                     <label for="email">Email address</label>
-                    <input type="email" class="form-control" name="email" placeholder="Email" id="email">
+                    <input type="email" class="form-control" name="email" placeholder="Email" id="email" value={{email}}>
                 </div>
                 <div class="form-group">
                     <label>House Number</label>
-                    <input type="text" class="form-control" name="house_number" placeholder="House Number">
+                    <input type="text" class="form-control" name="house_number" placeholder="House Number" value={{house_number}}>
                 </div>
                 <div class="form-group">
                     <label>Street Name</label>
-                    <input type="text" class="form-control" name="street_name" placeholder="Street Name">
+                    <input type="text" class="form-control" name="street_name" placeholder="Street Name" value={{street_name}}>
                 </div>
                 <div class="form-group">
                     <label>Postal Code</label>
-                    <input type="text" class="form-control" name="postal_code" placeholder="Postal Code">
+                    <input type="text" class="form-control" name="postal_code" placeholder="Postal Code" value={{postal_code}}>
                 </div>
                 <div class="form-group">
                     <label>Province</label>
@@ -69,7 +75,7 @@
                 </div>
                 <div class="form-group">
                     <label>City</label>
-                    <input type="text" class="form-control" name="city" placeholder="City">
+                    <input type="text" class="form-control" name="city" placeholder="City" value={{city}}>
                 </div>
                 <div class="form-group">
                     <label>Payment Method</label>
