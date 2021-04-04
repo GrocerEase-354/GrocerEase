@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = '10.0.2.2'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
@@ -354,16 +354,22 @@ def account():
                     db_cursor.execute('''
                                             UPDATE customer
                                             SET {} = %s
-                                            WHERE id = 'H123'
+                                            WHERE id = %s
                                       '''.format(field.name) ,
-                                      (field.data,))
+                                      (field.data, current_user.userid))
+                elif field.name == 'payment_method':
+                    db_cursor.execute(f'''
+                                            UPDATE customer_payment_method
+                                            SET payment_method = '{field.data}'
+                                            WHERE customerid = '{current_user.userid}'
+                                      ''')
                 else:
                     db_cursor.execute('''
                                             UPDATE user
                                             SET {} = %s
-                                            WHERE userid = 'H123'
+                                            WHERE userid = %s
                                       '''.format(field.name) ,
-                                      (field.data,))
+                                      (field.data, current_user.userid))
 
                 db_connection.commit()
                 flash(f'Changes saved!', 'success')
@@ -374,8 +380,6 @@ def account():
 def initNavBar():
     topbar = Navbar(View("Home", "home"))
     nav.register_element('topbar', topbar)
-
-    
 
     if (not current_user.is_authenticated):
         topbar.items.append(View("Login", "login"))

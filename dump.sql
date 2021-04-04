@@ -250,16 +250,16 @@ DELIMITER ;
 
 /*User Table Entries*/
 INSERT INTO user VALUES
-('Y123','1234', 1,'152 Street','V3X123','British Columbia', 'Surrey', 'Yogesh@shaw.ca'),
-('A123','5678', 2,'156 Street','V3X456','British Columbia', 'Surrey', 'Andy@shaw.ca'),
-('H123','9101', 3,'158 Street','V3X789','British Columbia', 'Surrey', 'Hareet@shaw.ca'),
-('J123','1112', 4,'160 Street','V3X101','British Columbia', 'Surrey', 'Bob@shaw.ca'),
-('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brenden@shaw.ca'),
-('Micheal101','0987', 6,'160 Street','V3X112','British Columbia', 'Surrey', 'Micheal@shaw.ca'),
-('Jim123','6543', 7,'162 Street','V3X113','British Columbia', 'Surrey', 'Jim@shaw.ca'),
-('Dwight456','5432', 8,'164 Street','V3X114','British Columbia', 'Surrey', 'Dwight@shaw.ca'),
-('Pam789','4321', 9,'166 Street','V3X115','British Columbia', 'Surrey', 'Pam@shaw.ca'),
-('Mose112','7809', 10,'168 Street','V3X116','British Columbia', 'Surrey', 'Mose@shaw.ca');
+('Y123','1234', 1,'152 Street','V3X123','BC', 'Surrey', 'Yogesh@shaw.ca'),
+('A123','5678', 2,'156 Street','V3X456','BC', 'Surrey', 'Andy@shaw.ca'),
+('H123','9101', 3,'158 Street','V3X789','BC', 'Surrey', 'Hareet@shaw.ca'),
+('J123','1112', 4,'160 Street','V3X101','BC', 'Surrey', 'Bob@shaw.ca'),
+('B123','1314', 5,'162 Street','V3X111','BC', 'Surrey', 'Brenden@shaw.ca'),
+('Micheal101','0987', 6,'160 Street','V3X112','BC', 'Surrey', 'Micheal@shaw.ca'),
+('Jim123','6543', 7,'162 Street','V3X113','BC', 'Surrey', 'Jim@shaw.ca'),
+('Dwight456','5432', 8,'164 Street','V3X114','BC', 'Surrey', 'Dwight@shaw.ca'),
+('Pam789','4321', 9,'166 Street','V3X115','BC', 'Surrey', 'Pam@shaw.ca'),
+('Mose112','7809', 10,'168 Street','V3X116','BC', 'Surrey', 'Mose@shaw.ca');
 
 /*User Table Entries*/
 INSERT INTO customer VALUES
