@@ -227,9 +227,26 @@ def shopping_cart():
                        FROM product_in_shopping_cart AS PSC, product AS P 
                        WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
     products = cursor.fetchall()
+    
+
+
+    #calculating healthy choice
+    cursor.execute(f''' SELECT COUNT(*) 
+                        FROM customer A 
+                        WHERE A.id = '{ user.userid }' AND A.id IN (
+                            SELECT B.id 
+                            FROM customer B
+                            WHERE NOT EXISTS (
+                                SELECT category_name FROM category
+                                WHERE category_name NOT IN (SELECT product.category_name 
+                                                            FROM product_in_shopping_cart, product 
+                                                            WHERE product_in_shopping_cart.productid = product.productid AND product_in_shopping_cart.customerid = B.id)))
+                    ''')
+    isHealthyChoice = cursor.fetchone()[0]
+    print(isHealthyChoice)
     cursor.close()
 
-    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user)
+    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
 
 @app.route("/redirect")
 @login_required
