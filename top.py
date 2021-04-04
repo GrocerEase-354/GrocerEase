@@ -184,7 +184,7 @@ def login_post():
         user2 = create_user(user[0][0])
         print("Jello")
         login_user(user2, remember=remember)
-        return redirect(url_for('profile'))
+        return redirect(url_for('home'))
 
     return render_template('login.html', form=login_form)
 
@@ -479,7 +479,6 @@ def initNavBar():
 
         topbar.items.append(Text("Logged in as " + current_user.userid))
         topbar.items.append(View("Logout", "logout"))
-        topbar.items.append(View("Profile", "profile"))
         topbar.items.append(View("My Account", "account"))
     
 

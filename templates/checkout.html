@@ -4,6 +4,8 @@
 {% endblock title %}
 
 {% block content  %}
+
+<div class="mainContent">
 <h1>
     Order Summary
 </h1>
@@ -26,4 +28,6 @@ Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
 <form method="POST">
     <button name="cancel" type="submit">Cancel</button>
 </form>
+
+</div>
 {% endblock content %}
