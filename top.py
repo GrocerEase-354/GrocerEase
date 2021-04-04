@@ -438,7 +438,7 @@ def initNavBar():
         topbar.items.append(View("Sign Up", "signup"))
     else:
         cursor = mysql.connection.cursor()
-        cursor.execute(f"""SELECT COUNT(*) FROM product_in_shopping_cart WHERE customerid='{current_user.userid}'""")
+        cursor.execute(f"""SELECT SUM(quantity) AS total_items FROM product_in_shopping_cart WHERE customerid='{current_user.userid}'""")
         shopping_cart_items_count = cursor.fetchall()[0][0]
 
         cursor.execute('''SELECT category_name FROM category''')
