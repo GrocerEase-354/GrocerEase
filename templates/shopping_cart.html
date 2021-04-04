@@ -11,9 +11,7 @@
             color: transparent;
         }
     </style>
-    <form method="POST">
-        <button name="sc" type="submit">Back to Index</button>
-    </form>
+
     <h1>
         {{user.fname + " " + user.lname}}'s Shopping Cart
     </h1>
@@ -40,7 +38,7 @@
                 <td>{{qty}}</td>
                 <td>{{price}}</td>
                 <td>{{totalPrice}}</td>
-                <td><form autocomplete="off" method="POST"><button name="delete_{{pid}}" type="submit">Delete</button></form></td>
+                <td><form autocomplete="off" method="POST"><button name="delete_{{pid}}" type="submit" class="btn btn-danger">Delete</button></form></td>
             </tr>
         {% endfor %}
     </table>
@@ -49,7 +47,7 @@
     Taxes: {{"$%.2f"|format(subtotal|float()*0.12)}} <br>
     Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
     <form method="post">
-        <button name="checkout" type="submit">Proceed To Checkout</button>
+        <button name="checkout" type="submit" class="btn btn-secondary">Proceed To Checkout</button>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

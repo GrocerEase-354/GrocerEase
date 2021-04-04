@@ -21,7 +21,7 @@ bootstrap = Bootstrap(app)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'onlinegrocery'
+app.config['MYSQL_DB'] = 'cmpt354'
 app.config['SECRET_KEY'] = 'test'
 
 mysql = MySQL(app)
@@ -249,13 +249,6 @@ def shopping_cart():
 
 
     cursor = mysql.connection.cursor() 
-    # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
-                       FROM product_in_shopping_cart AS PSC, product AS P 
-                       WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
-    products = cursor.fetchall()
-    
-
 
     #calculating healthy choice
     cursor.execute(f''' SELECT COUNT(*) 
