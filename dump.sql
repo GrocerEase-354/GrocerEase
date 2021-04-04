@@ -122,14 +122,15 @@ CREATE TABLE customer_payment_method (
 );
 
 DELIMITER $$
-
+# Continue generation id's for orders and carts automatically after an initial value is inserted
 CREATE TRIGGER OrderIdGeneration BEFORE INSERT ON store_order
 FOR EACH ROW
     IF NEW.orderid IS NULL
-    THEN  SET NEW.orderid = (
-          SELECT MAX(orderid)
-          FROM store_order) + 1;
-    END IF;
+    THEN    SET NEW.orderid = (
+            SELECT MAX(orderid)
+            FROM store_order) + 1;
+     END IF;
+
 
 CREATE TRIGGER CartIdGeneration BEFORE INSERT ON shopping_cart
 FOR EACH ROW
