@@ -287,11 +287,35 @@ INSERT INTO category VALUES
 
 /*Product table entries*/
 INSERT INTO product VALUES
-(123,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
-(456,5,'A dozen fresh Beetroots.','2021-4-25','Beets',4.99,'Dwight456','Vegetables'),
-(789,5,'A fresh jug of milk.','2021-4-26','Milk',1.99,'Pam789','Dairy'),
-(101,5,'A whole chicken.','2021-4-24','Chicken',5.99,'Micheal101','Meat'),
-(112,5,'A fresh loaf of Bread.','2021-4-24','Bread',3.99,'Mose112','Bread');
+(100,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
+(101,5,'A dozen fresh Apples.','2021-04-24','Apple',3.99,'Jim123','Fruits'),
+(102,5,'A bunch of fresh Grapes.','2021-04-24','Grape',4.99,'Jim123','Fruits'),
+(103,5,'A box of fresh Oranges.','2021-04-24','Orange',5.99,'Jim123','Fruits'),
+(104,5,'A box of fresh Peaches.','2021-04-24','Peach',6.99,'Jim123','Fruits'),
+
+(106,5,'A dozen fresh Beetroots.','2021-4-25','Beet',7.99,'Dwight456','Vegetables'),
+(107,5,'A dozen fresh Carrots.','2021-4-25','Carrot',8.99,'Dwight456','Vegetables'),
+(108,5,'A fresh bunch of Lettuce.','2021-4-25','Lettuce',9.99,'Dwight456','Vegetables'),
+(109,5,'A fresh Cauliflower.','2021-4-25','Cauliflower',10.99,'Dwight456','Vegetables'),
+(110,5,'Half-Dozen fresh Eggplant.','2021-4-25','Eggplant',11.99,'Dwight456','Vegetables'),
+
+(111,5,'A fresh jug of Milk.','2021-4-26','Milk',12.99,'Pam789','Dairy'),
+(112,5,'A fresh tub of Yogurt.','2021-4-26','Yogurt',13.99,'Pam789','Dairy'),
+(113,5,'A fresh wheel of Cheese.','2021-4-26','Cheese',13.99,'Pam789','Dairy'),
+(114,5,'A fresh tub of Ice Cream.','2021-4-26','Ice Cream',15.99,'Pam789','Dairy'),
+(115,5,'A fresh jug of Skim Milk.','2021-4-26','Skim Milk',16.99,'Pam789','Dairy'),
+
+(116,5,'A whole Chicken.','2021-4-27','Chicken',17.99,'Micheal101','Meat'),
+(117,5,'A whole Turkey.','2021-4-27','Turkey',18.99,'Micheal101','Meat'),
+(118,5,'A whole Salmon.','2021-4-27','Salmon',19.99,'Micheal101','Meat'),
+(119,5,'A whole Steak.','2021-4-27','Steak',20.99,'Micheal101','Meat'),
+(120,5,'A whole Goat.','2021-4-27','Goat',21.99,'Micheal101','Meat'),
+
+(121,5,'A fresh loaf of Bread.','2021-4-28','Bread',2.99,'Mose112','Bread'),
+(122,5,'A dozen fresh Cheese Buns.','2021-4-28','Cheese Buns',3.99,'Mose112','Bread'),
+(123,5,'A dozen fresh Croissants.','2021-4-28','Croissant',4.99,'Mose112','Bread'),
+(124,5,'A fresh loaf of Whole Wheat Bread.','2021-4-28','Whole Wheat Bread',5.99,'Mose112','Bread'),
+(125,5,'A fresh loaf of Gluten Free Bread.','2021-4-28','Gluten Free Bread',6.99,'Mose112','Bread');
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
@@ -324,19 +348,19 @@ INSERT INTO shopping_cart VALUE
 
 /*product_in_shopping_cart*/
 INSERT INTO product_in_shopping_cart VALUES
-    (123,'Y123',123,2),
-    (456,'Y123',123,2),
-    (789,'A123',456,2),
-    (101,'H123',789,2),
-    (112,'J123',101,2);
+    (101,'Y123',123,2),
+    (125,'A123',456,2),
+    (103,'H123',789,2),
+    (104,'J123',101,2),
+    (106,'B123',112,2);
 
 /*Adds entries*/
 INSERT INTO adds VALUES
-('Y123', 123),
-('Y123',456),
-('A123',789),
-('H123',101),
-('J123',112);
+('Y123', 101),
+('A123',125),
+('H123',103),
+('J123',104),
+('B123',106);
 
 /*customer_payment_method entries*/
 INSERT INTO customer_payment_method VAlUES
