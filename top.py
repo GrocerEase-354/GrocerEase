@@ -306,6 +306,16 @@ def profile():
 def logged_out():
     return render_template("logged_out.html", user=current_user)
 
+@app.route("/categories")
+def categories():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT category_name, COUNT(*) FROM product GROUP BY category_name")
+    retVal = cursor.fetchall()
+    cursor.execute("SELECT COUNT(*) FROM product")
+    total = cursor.fetchall()
+    cursor.close()
+    return render_template("overview.jinja2", retVal = retVal, total = total)
+
 @app.route("/category/<selected_category>", methods=['GET', 'POST'])
 @login_required
 def goToCategory(selected_category):
@@ -313,7 +323,7 @@ def goToCategory(selected_category):
     if (actualSelectedCategory == "all"):
         actualSelectedCategory = "%"
     cursor = mysql.connection.cursor()
-    productsToSelect = "product_name, price, sellerid, product_description, category_name, best_before_date"
+    productsToSelect = "product_name, price, sellerid, product_description, category_name, best_before_date, productid"
     # preventing SQL injection from URL
     cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
@@ -329,6 +339,31 @@ def goToCategory(selected_category):
     if (request.method == "POST"):
         if (request.form['submitbutton'] == "home"):
             return redirect(url_for("home"))
+        else:
+            cursor2 = mysql.connection.cursor()
+            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{ current_user.userid }'")
+            cartid = cursor2.fetchall()[0][0]
+
+            checkexist = f"SELECT productid, customerid, cartid FROM product_in_shopping_cart WHERE productid='{request.form['submitbutton']}' AND customerid='{ current_user.userid }' AND cartid = '{ cartid }' "
+            cursor2.execute(checkexist)
+            checkexistret = cursor2.fetchall()
+            if (checkexistret):
+                updatebyone = f'''UPDATE product_in_shopping_cart SET quantity = quantity + 1 
+                            WHERE product_in_shopping_cart.productid IN (
+                            SELECT * FROM (SELECT B.productid FROM product_in_shopping_cart A 
+                            INNER JOIN product_in_shopping_cart B ON A.productid = B.productid WHERE A.productid = {request.form['submitbutton']} 
+                            AND A.customerid = '{ current_user.userid }' AND A.cartid = { cartid }) as temp)'''
+                cursor2.execute(updatebyone)
+                mysql.connection.commit()
+            else:
+                commitmsg = f"INSERT INTO product_in_shopping_cart VALUES({request.form['submitbutton']}, '{ current_user.userid }', { cartid }, 1)"
+                cursor2.execute(commitmsg)
+                mysql.connection.commit()
+            
+            cursor2.close()
+
+            
+            return redirect(url_for("goToCategory", selected_category = selected_category))
     else:      
         return render_template("category.jinja2", selected_category=selected_category, retVal=retVal)
 
@@ -388,6 +423,7 @@ def initNavBar():
         cursor.close()
         #topbar.items.append(View("Hello", "home"))
         items = []
+        items.append(View("Overview", "categories"))
         items.append(View("All", "goToCategory", selected_category = "All"))
         for i in retVal:
             j = ''.join(i)  # to get the string

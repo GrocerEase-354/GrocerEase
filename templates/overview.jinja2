@@ -1,0 +1,40 @@
+{% extends "navbar.jinja2" %}
+{% block title %}
+Categories
+{% endblock title%}
+
+{% block content %}
+
+
+<h1>Category Listing</h1>
+
+<h4>Total Number of Listings: {{ total[0][0] }}</h4>
+
+<table class="table">
+    <tr>
+        <th>
+            Category Name
+        </th>
+        <th>
+            Number of Items
+        </th>
+    </tr>
+
+    {% for i in retVal %}
+    <tr>
+        {% for j in i %}
+        <td>
+            {{ j }}
+        </td>
+        {% endfor %}
+    </tr>
+
+    {% endfor %}
+</table>
+
+<form method="post"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
+
+
+
+{% endblock content %}
+

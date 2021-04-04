@@ -31,11 +31,17 @@
     </tr>
     {% for i in retVal %}
     <tr>
-        {% for j in i %}
+        {% for j in i[0:-1] %}
         <td>
             {{ j }}
         </td>
         {% endfor %}
+        {% for j in [i[-1]] %}
+        <td>
+            <form method="post"><button type="submit" name="submitbutton" value={{ j }} class="btn btn-warning">{{ j }}</button></form>
+        </td>
+        {% endfor %}
+        
     </tr>
 
     {% endfor %}
