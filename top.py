@@ -341,40 +341,42 @@ def orders():
     return render_template('orderHistory.jinja2', orders = retVal)
 
 @app.route('/account', methods=['GET', 'POST'])
+@login_required
 def account():
-    form = CustomerAccountForm()
+    # form = CustomerAccountForm()
 
-    if form.validate_on_submit():
-        db_connection = mysql.connection
-        db_cursor = db_connection.cursor()
+    # if form.validate_on_submit():
+    #     db_connection = mysql.connection
+    #     db_cursor = db_connection.cursor()
         
-        for field in form:
-            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
-                if field.name == 'first_name' or field.name == 'last_name':
-                    db_cursor.execute('''
-                                            UPDATE customer
-                                            SET {} = %s
-                                            WHERE id = %s
-                                      '''.format(field.name) ,
-                                      (field.data, current_user.userid))
-                elif field.name == 'payment_method':
-                    db_cursor.execute(f'''
-                                            UPDATE customer_payment_method
-                                            SET payment_method = '{field.data}'
-                                            WHERE customerid = '{current_user.userid}'
-                                      ''')
-                else:
-                    db_cursor.execute('''
-                                            UPDATE user
-                                            SET {} = %s
-                                            WHERE userid = %s
-                                      '''.format(field.name) ,
-                                      (field.data, current_user.userid))
+    #     for field in form:
+    #         if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
+    #             if field.name == 'first_name' or field.name == 'last_name':
+    #                 db_cursor.execute('''
+    #                                         UPDATE customer
+    #                                         SET {} = %s
+    #                                         WHERE id = %s
+    #                                   '''.format(field.name) ,
+    #                                   (field.data, current_user.userid))
+    #             elif field.name == 'payment_method':
+    #                 db_cursor.execute(f'''
+    #                                         UPDATE customer_payment_method
+    #                                         SET payment_method = '{field.data}'
+    #                                         WHERE customerid = '{current_user.userid}'
+    #                                   ''')
+    #             else:
+    #                 db_cursor.execute('''
+    #                                         UPDATE user
+    #                                         SET {} = %s
+    #                                         WHERE userid = %s
+    #                                   '''.format(field.name) ,
+    #                                   (field.data, current_user.userid))
 
-                db_connection.commit()
-                flash(f'Changes saved!', 'success')
-    return render_template('account.html', title='Account', form=form)
-
+    #             db_connection.commit()
+    #             flash(f'Changes saved!', 'success')
+    # return render_template('account.html', title='Account', form=form)
+    house_number = str(current_user.house_number)
+    return render_template('account_new.jinja2', user = current_user, house_number = house_number)
 
 @app.before_request
 def initNavBar():
