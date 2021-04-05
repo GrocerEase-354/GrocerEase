@@ -375,8 +375,45 @@ def account():
     #             db_connection.commit()
     #             flash(f'Changes saved!', 'success')
     # return render_template('account.html', title='Account', form=form)
-    house_number = str(current_user.house_number)
-    return render_template('account_new.jinja2', user = current_user, house_number = house_number)
+    if request.method == "POST":
+        #try this ---> request.form.get("something", False)
+        if request.form.get['submitbutton'] == "name":
+            return redirect(url_for("name"))
+        elif request.form['submitbutton'] == "password":
+            return redirect(url_for("password"))
+        elif request.form['submitbutton'] == "email":
+            return redirect(url_for("email"))
+        elif request.form['submitbutton'] == "address":
+            return redirect(url_for("address"))
+        elif request.form['submitbutton'] == "payment_method":
+            return redirect(url_for("payment_method"))     
+    else:
+        house_number = str(current_user.house_number)
+        return render_template('account_new.jinja2', user = current_user, house_number = house_number)
+    
+
+@app.route('/name', methods=['GET', 'POST'])
+@login_required
+def name():
+    form = CustomerNameForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        for field in form:
+            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
+                db_cursor.execute('''
+                                        UPDATE customer
+                                        SET {} = %s
+                                        WHERE id = %s
+                                    '''.format(field.name) ,
+                                    (field.data, current_user.userid))
+
+                db_connection.commit()
+                flash(f'Changes saved!', 'success')
+    
+    return render_template('name.jinja2', form=form)
 
 @app.before_request
 def initNavBar():
