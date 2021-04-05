@@ -17,28 +17,28 @@
     <h1>My Account</h1>
     <div class="row general">
         <b>Full Name:</b>
-        <form method="post"><button type="submit" name="submitbutton" value="name" class="btn btn-warning">Edit</button></form>
+        <form method="POST"><button type="submit" name="submitbutton" value="name" class="btn btn-warning">Edit</button></form>
     </div>
     <div class ="row data_entry">
         {{user.fname + " " + user.lname}}
     </div>
     <div class="row general">
         <b>Password:</b> 
-        <form method="post"><button type="submit" name="submitbutton" value="password" class="btn btn-warning">Edit</button></form>
+        <form method="POST"><button type="submit" name="submitbutton" value="password" class="btn btn-warning">Edit</button></form>
     </div>
     <div class ="row data_entry">
         **********
     </div>
     <div class="row general">
         <b>Email:</b> 
-        <form method="post"><button type="submit" name="submitbutton" value="email" class="btn btn-warning">Edit</button></form>
+        <form method="POST"><button type="submit" name="submitbutton" value="email" class="btn btn-warning">Edit</button></form>
     </div>
     <div class ="row data_entry">
         {{user.email}}
     </div>
     <div class="row general">
         <b>Address:</b> 
-        <form method="post"><button type="submit" name="submitbutton" value="address" class="btn btn-warning">Edit</button></form>
+        <form method="POST"><button type="submit" name="submitbutton" value="address" class="btn btn-warning">Edit</button></form>
     </div>
     <div class ="row general">
         {{house_number + " " + user.street_name}}
@@ -48,7 +48,7 @@
     </div>
     <div class="row general">
         <b>Payment Method:</b>
-        <form method="post"><button type="submit" name="submitbutton" value="payment_method" class="btn btn-warning">Edit</button></form> 
+        <form method="POST"><button type="submit" name="submitbutton" value="payment_method" class="btn btn-warning">Edit</button></form> 
     </div>
     <div class ="row data_entry">
         {{user.payment_method}}

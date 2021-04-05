@@ -371,13 +371,14 @@ def account():
     #                                         WHERE userid = %s
     #                                   '''.format(field.name) ,
     #                                   (field.data, current_user.userid))
+        
+    #     db_connection.commit()
 
-    #             db_connection.commit()
-    #             flash(f'Changes saved!', 'success')
-    # return render_template('account.html', title='Account', form=form)
+    # return render_template('account.html', form = form)
+
     if request.method == "POST":
         #try this ---> request.form.get("something", False)
-        if request.form.get['submitbutton'] == "name":
+        if request.form['submitbutton'] == "name":
             return redirect(url_for("name"))
         elif request.form['submitbutton'] == "password":
             return redirect(url_for("password"))
@@ -410,9 +411,10 @@ def name():
                                     '''.format(field.name) ,
                                     (field.data, current_user.userid))
 
-                db_connection.commit()
-                flash(f'Changes saved!', 'success')
-    
+        db_connection.commit()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
     return render_template('name.jinja2', form=form)
 
 @app.before_request
