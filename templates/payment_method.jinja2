@@ -1,0 +1,39 @@
+{% extends "navbar.jinja2" %}
+{% block content %}
+    <style>
+        label, input, select, button, h1, .alert {
+            margin-left: 100px;
+            margin-top: 10px;
+            /*margin: 10px 0 0 100px;*/
+        }
+        
+    </style>
+
+    <style link=""></style>
+    <h1>My Account</h1>
+    <div class="content-section">
+        <div style="width: 500px;">
+            <form method="POST" action="{{ url_for('payment_method') }}">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <div class="form-group">
+                        {{ form.payment_method.label(class="form-control-label") }}
+                        {% if form.payment_method.errors %}
+                            {{ form.payment_method(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.payment_method.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.payment_method(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-warning") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

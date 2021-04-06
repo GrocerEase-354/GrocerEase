@@ -343,41 +343,7 @@ def orders():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    # form = CustomerAccountForm()
-
-    # if form.validate_on_submit():
-    #     db_connection = mysql.connection
-    #     db_cursor = db_connection.cursor()
-        
-    #     for field in form:
-    #         if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
-    #             if field.name == 'first_name' or field.name == 'last_name':
-    #                 db_cursor.execute('''
-    #                                         UPDATE customer
-    #                                         SET {} = %s
-    #                                         WHERE id = %s
-    #                                   '''.format(field.name) ,
-    #                                   (field.data, current_user.userid))
-    #             elif field.name == 'payment_method':
-    #                 db_cursor.execute(f'''
-    #                                         UPDATE customer_payment_method
-    #                                         SET payment_method = '{field.data}'
-    #                                         WHERE customerid = '{current_user.userid}'
-    #                                   ''')
-    #             else:
-    #                 db_cursor.execute('''
-    #                                         UPDATE user
-    #                                         SET {} = %s
-    #                                         WHERE userid = %s
-    #                                   '''.format(field.name) ,
-    #                                   (field.data, current_user.userid))
-        
-    #     db_connection.commit()
-
-    # return render_template('account.html', form = form)
-
     if request.method == "POST":
-        #try this ---> request.form.get("something", False)
         if request.form['submitbutton'] == "name":
             return redirect(url_for("name"))
         elif request.form['submitbutton'] == "password":
@@ -387,12 +353,13 @@ def account():
         elif request.form['submitbutton'] == "address":
             return redirect(url_for("address"))
         elif request.form['submitbutton'] == "payment_method":
-            return redirect(url_for("payment_method"))     
+            return redirect(url_for("payment_method"))
+        elif (request.form['submitbutton'] == "home"):
+            return redirect(url_for("home"))  
     else:
         house_number = str(current_user.house_number)
         return render_template('account_new.jinja2', user = current_user, house_number = house_number)
     
-
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
 def name():
@@ -402,20 +369,115 @@ def name():
         db_connection = mysql.connection
         db_cursor = db_connection.cursor()
         
-        for field in form:
-            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
-                db_cursor.execute('''
-                                        UPDATE customer
-                                        SET {} = %s
-                                        WHERE id = %s
-                                    '''.format(field.name) ,
-                                    (field.data, current_user.userid))
+        if form.first_name.data != None and form.first_name.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE customer 
+                                    SET first_name = "{form.first_name.data}" 
+                                    WHERE id = "{current_user.userid}"
+                               ''')
+        
+        if form.last_name.data != None and form.last_name.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE customer 
+                                    SET last_name = "{form.last_name.data}" 
+                                    WHERE id = "{current_user.userid}"
+                               ''')
 
         db_connection.commit()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
-    return render_template('name.jinja2', form=form)
+    return render_template('name.jinja2', form = form)
+
+@app.route('/password', methods=['GET', 'POST'])
+@login_required
+def password():
+    form = PasswordForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        if form.user_password.data != None and form.user_password.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE user 
+                                    SET user_password = "{form.user_password.data}"
+                                    WHERE userid = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('password.jinja2', form = form)
+
+@app.route('/email', methods=['GET', 'POST'])
+@login_required
+def email():
+    form = EmailForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        if form.email.data != None and form.email.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE user 
+                                    SET email = "{form.email.data}"
+                                    WHERE userid = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('email.jinja2', form = form)
+
+@app.route('/address', methods=['GET', 'POST'])
+@login_required
+def address():
+    form = AddressForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+
+        for field in form:
+            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
+                db_cursor.execute('''
+                                        UPDATE user
+                                        SET {} = %s
+                                        WHERE userid = %s
+                                  '''.format(field.name) ,
+                                  (field.data, current_user.userid))
+
+        db_connection.commit()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('address.jinja2', form = form)
+
+@app.route('/payment_method', methods=['GET', 'POST'])
+@login_required
+def payment_method():
+    form = PaymentMethodForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        if form.payment_method.data != None and form.payment_method.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE customer_payment_method
+                                    SET payment_method = "{form.payment_method.data}"
+                                    WHERE customerid = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('payment_method.jinja2', form = form)
 
 @app.before_request
 def initNavBar():
