@@ -358,7 +358,7 @@ def account():
             return redirect(url_for("home"))  
     else:
         house_number = str(current_user.house_number)
-        return render_template('account_new.jinja2', user = current_user, house_number = house_number)
+        return render_template('account.jinja2', user = current_user, house_number = house_number)
     
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
