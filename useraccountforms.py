@@ -33,7 +33,7 @@ class AddressForm(FlaskForm):
 class PaymentMethodForm(FlaskForm):
     delete_payment_method = StringField('Payment Methods')
     add_payment_method = SelectField(u'Add Payment Method', choices=[(''), ('Credit Card'), ('Debit Card'), ('PayPal')], validators=[Optional()])
-    submit = SubmitField('Add')
+    submit = SubmitField('Save Changes')
 
 
 

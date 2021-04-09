@@ -343,6 +343,20 @@ def orders():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+
+    # get the current user's payment methods
+    db_connection = mysql.connection
+    db_cursor = db_connection.cursor()
+
+    db_cursor.execute(f'''
+                            SELECT payment_method
+                            FROM customer_payment_method
+                            WHERE customerid = "{current_user.userid}"
+                       ''')
+
+    payment_methods = db_cursor.fetchall()
+    db_cursor.close()
+
     if request.method == "POST":
         if request.form['submitbutton'] == "name":
             return redirect(url_for("name"))
@@ -358,7 +372,7 @@ def account():
             return redirect(url_for("home"))  
     else:
         house_number = str(current_user.house_number)
-        return render_template('account.jinja2', user = current_user, house_number = house_number)
+        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = payment_methods)
     
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
@@ -384,6 +398,7 @@ def name():
                                ''')
 
         db_connection.commit()
+        db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
@@ -406,6 +421,7 @@ def password():
                                ''')
 
         db_connection.commit()
+        db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
@@ -428,6 +444,7 @@ def email():
                                ''')
 
         db_connection.commit()
+        db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
@@ -452,6 +469,7 @@ def address():
                                   (field.data, current_user.userid))
 
         db_connection.commit()
+        db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
