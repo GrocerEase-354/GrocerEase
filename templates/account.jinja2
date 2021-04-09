@@ -48,14 +48,14 @@
         {{user.city + ", " + user.province + " " + user.postal_code}}
     </div>
     <div class="row general">
-        <b>Payment Method:</b>
-        <form method="POST"><button type="submit" name="submitbutton" value="payment_method" class="btn btn-warning">Edit</button></form> 
+        <b>Payment Methods:</b>
+        <form method="POST"><button type="submit" name="submitbutton" value="payment_methods" class="btn btn-warning">Edit</button></form> 
     </div>
     <div class ="row data_entry">
         {{user.payment_method}}
     </div>
 
-    <form method="post"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
+    <form method="POST"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
     
 {% endblock content %}
 

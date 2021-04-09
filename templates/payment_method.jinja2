@@ -1,7 +1,7 @@
 {% extends "navbar.jinja2" %}
 {% block content %}
     <style>
-        label, input, select, button, h1, .alert {
+        label, input, select, button, h1, table, .alert {
             margin-left: 100px;
             margin-top: 10px;
             /*margin: 10px 0 0 100px;*/
@@ -13,20 +13,35 @@
     <h1>My Account</h1>
     <div class="content-section">
         <div style="width: 500px;">
-            <form method="POST" action="{{ url_for('payment_method') }}">
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form.delete_payment_method.label(class="form-control-label") }}
+                </div>
+            </fieldset>
+
+            <table>
+                {% for method in payment_methods %}
+                    <tr>
+                        <td>{{method[0]}}</td>
+                        <td><form autocomplete="off" method="POST"><button name="delete_{{method[0]}}" type="submit">Delete</button></form></td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            <form method="POST" name="submitbutton" value="" action="{{ url_for('payment_methods') }}">
                 {{ form.hidden_tag() }}
                 <fieldset class="form-group">
                     <div class="form-group">
-                        {{ form.payment_method.label(class="form-control-label") }}
-                        {% if form.payment_method.errors %}
-                            {{ form.payment_method(class="form-control form-control-lg is-invalid") }}
+                        {{ form.add_payment_method.label(class="form-control-label") }}
+                        {% if form.add_payment_method.errors %}
+                            {{ form.add_payment_method(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
-                                {% for error in form.payment_method.errors %}
+                                {% for error in form.add_payment_method.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.payment_method(class="form-control form-control-lg") }}
+                            {{ form.add_payment_method(class="form-control form-control-lg") }}
                         {% endif %}
                     </div>
                 </fieldset>

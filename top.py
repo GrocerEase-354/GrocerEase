@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import date
-from useraccountforms import CustomerNameForm, SellerCompanyNameForm, PasswordForm, EmailForm, AddressForm, PaymentMethodForm, CustomerAccountForm, SellerAccountForm
+from useraccountforms import CustomerNameForm, SellerCompanyNameForm, PasswordForm, EmailForm, AddressForm, PaymentMethodForm
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, Optional
@@ -352,8 +352,8 @@ def account():
             return redirect(url_for("email"))
         elif request.form['submitbutton'] == "address":
             return redirect(url_for("address"))
-        elif request.form['submitbutton'] == "payment_method":
-            return redirect(url_for("payment_method"))
+        elif request.form['submitbutton'] == "payment_methods":
+            return redirect(url_for("payment_methods"))
         elif (request.form['submitbutton'] == "home"):
             return redirect(url_for("home"))  
     else:
@@ -457,27 +457,54 @@ def address():
 
     return render_template('address.jinja2', form = form)
 
-@app.route('/payment_method', methods=['GET', 'POST'])
+@app.route('/payment_methods', methods=['GET', 'POST'])
 @login_required
-def payment_method():
+def payment_methods():
     form = PaymentMethodForm()
+    
+    # get the current user's payment methods
+    db_connection = mysql.connection
+    db_cursor = db_connection.cursor()
 
+    db_cursor.execute(f'''
+                            SELECT payment_method
+                            FROM customer_payment_method
+                            WHERE customerid = "{current_user.userid}"
+                       ''')
+
+    payment_methods = db_cursor.fetchall()
+
+    # the user adds a payment method
     if form.validate_on_submit():
-        db_connection = mysql.connection
-        db_cursor = db_connection.cursor()
-        
-        if form.payment_method.data != None and form.payment_method.data != '':
+        if form.add_payment_method.data != None and form.add_payment_method.data != '':
             db_cursor.execute(f'''
-                                    UPDATE customer_payment_method
-                                    SET payment_method = "{form.payment_method.data}"
-                                    WHERE customerid = "{current_user.userid}"
+                                    INSERT IGNORE INTO customer_payment_method
+                                    VALUES ("{current_user.userid}", "{form.add_payment_method.data}")
                                ''')
 
         db_connection.commit()
+        db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
+    
+    # the user deletes a payment method
+    elif request.method == "POST":
+        for method in payment_methods:
+            if f"delete_{method[0]}" in request.form:
+                db_connection = mysql.connection
+                db_cursor = db_connection.cursor()
 
-    return render_template('payment_method.jinja2', form = form)
+                db_cursor.execute(f''' 
+                                        DELETE FROM customer_payment_method
+                                        WHERE customerid = "{current_user.userid}" AND payment_method = "{method[0]}"
+                                   ''')
+
+                db_connection.commit()
+                db_cursor.close()
+                return redirect(url_for("payment_methods"))
+
+    db_cursor.close()
+    return render_template('payment_method.jinja2', form = form, payment_methods = payment_methods)
 
 @app.before_request
 def initNavBar():
@@ -506,10 +533,6 @@ def initNavBar():
         for i in retVal:
             j = ''.join(i)  # to get the string
             topbar.items.append(View(j, "goToCategory", selected_category = j))
-
-
-    
-    
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
