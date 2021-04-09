@@ -17,7 +17,7 @@ class User(UserMixin):
         email,
         fname,
         lname,
-        payment_method):
+        payment_methods):
 
         self.userid = userid
         self.password = password
@@ -29,7 +29,7 @@ class User(UserMixin):
         self.email = email
         self.fname = fname
         self.lname = lname
-        self.payment_method = payment_method
+        self.payment_methods = payment_methods
 
     def to_tuple(self):
         return (
@@ -43,7 +43,7 @@ class User(UserMixin):
             self.email,
             self.fname,
             self.lname,
-            self.payment_method)
+            self.payment_methods)
 
     def to_dict(self):
         return self.__dict__
@@ -72,7 +72,7 @@ def create_user(user_id):
         f"""SELECT payment_method
         FROM customer_payment_method
         WHERE customerid='{user_id}'""")
-    pm = cursor.fetchall()[0][0]
+    pm = cursor.fetchall()
 
     cursor.close()
     return User(
@@ -86,5 +86,5 @@ def create_user(user_id):
         email=em,
         fname=fn,
         lname=ln,
-        payment_method=pm
+        payment_methods=pm
     )

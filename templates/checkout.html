@@ -19,11 +19,30 @@ Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
         <td>{{user_dict[name]}}</td>
     </tr>
     {% endfor %}
+    <tr>
+        <td>Payment Method:</td>
+    </tr>
+    <tr>
+        <td>
+            <form class="form-group" method="POST">
+                <div class="form-group">
+                    <select name="payment_method" class="form-control">
+                        <option value="" selected>Choose a payment method</option>
+                        {% for method in payment_methods %}
+                            <option value="{{method[0]}}">{{method[0]}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button name="confirm" type="submit">Confirm</button>
+                </div>
+                <form method="POST">
+                    <button name="cancel" type="submit">Cancel</button>
+                </form>
+            </form>
+        </td>
+    </tr>
 </table>
-<form method="POST">
-    <button name="confirm" type="submit">Confirm</button>
-</form>
-<form method="POST">
-    <button name="cancel" type="submit">Cancel</button>
-</form>
+
+
 {% endblock content %}

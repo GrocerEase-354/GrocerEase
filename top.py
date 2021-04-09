@@ -55,7 +55,7 @@ def load_user(user_id):
         f"""SELECT payment_method
         FROM customer_payment_method
         WHERE customerid='{user_id}'""")
-    pm = cursor.fetchall()[0][0]
+    pm = cursor.fetchall()
 
     cursor.close()
     return User(
@@ -69,7 +69,7 @@ def load_user(user_id):
         email=em,
         fname=fn,
         lname=ln,
-        payment_method=pm
+        payment_methods=pm
     )
 
 
@@ -122,7 +122,7 @@ def signup_post():
         email=email,
         fname=fname,
         lname=lname,
-        payment_method=payment_method
+        payment_methods=(payment_method,)
     )
 
     #session['user'] = user_obj
@@ -240,7 +240,6 @@ def redirect_on_delete():
 @login_required
 def checkout(): 
     cursor = mysql.connection.cursor()
-
     user = current_user
 
     # get the subtotal
@@ -248,31 +247,33 @@ def checkout():
 
     if request.method == "POST":
         if "confirm" in request.form:
-            ts = date.today()
+            payment_method = request.form.get('payment_method')
+            if payment_method != "":
+                ts = date.today()
 
-            cursor = mysql.connection.cursor()
+                cursor = mysql.connection.cursor()
 
-            cursor.execute(f"""SELECT orderid FROM store_order GROUP BY orderid ORDER BY orderid DESC""")
+                cursor.execute(f"""SELECT orderid FROM store_order GROUP BY orderid ORDER BY orderid DESC""")
 
-            orderID = cursor.fetchall()[0][0]+1
+                orderID = cursor.fetchall()[0][0]+1
 
-            subtotal = session['subtotal']
+                subtotal = session['subtotal']
 
-            print(orderID)
+                print(orderID)
 
-            cursor.execute(f"""INSERT INTO store_order (`customerid`, `orderid`, `cost`, `order_time`, `payment_method_used`)
-                            VALUES ('{user.userid}', {orderID}, {subtotal*1.12}, '{ts}', '{user.payment_method}')""")
-            mysql.connection.commit()
+                cursor.execute(f"""INSERT INTO store_order (`customerid`, `orderid`, `cost`, `order_time`, `payment_method_used`)
+                                VALUES ('{user.userid}', {orderID}, {subtotal*1.12}, '{ts}', '{payment_method}')""")
+                mysql.connection.commit()
 
-            cursor.execute(f"""DELETE FROM product_in_shopping_cart
-                               WHERE customerid='{user.userid}'""")
-            mysql.connection.commit()
-            return redirect(url_for("order_confirmed"))
+                cursor.execute(f"""DELETE FROM product_in_shopping_cart
+                                WHERE customerid='{user.userid}'""")
+                mysql.connection.commit()
+                return redirect(url_for("order_confirmed"))
             
         elif "cancel" in request.form:
             return redirect(url_for("shopping_cart"))
 
-    return render_template("checkout.html", user=current_user, subtotal=subtotal, user_dict={
+    return render_template("checkout.html", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
         "Name": current_user.fname + " " + current_user.lname,
         "Email": current_user.email,
         "House Number": current_user.house_number,
@@ -280,7 +281,6 @@ def checkout():
         "Postal Code": current_user.postal_code,
         "Province": current_user.province,
         "City": current_user.city,
-        "Payment Method": current_user.payment_method
     })
 
 @app.route("/order_confirmed", methods=["GET", "POST"])
@@ -335,9 +335,10 @@ def goToCategory(selected_category):
 @app.route("/orders")
 def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute('''SELECT first_name, last_name,orderid,product_name,cost,order_Time,payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
+    cursor.execute('''SELECT first_name, last_name, orderid, product_name, cost, order_time, payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
     retVal = cursor.fetchall()
     cursor.close()
+    print(retVal)
     return render_template('orderHistory.jinja2', orders = retVal)
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -345,17 +346,17 @@ def orders():
 def account():
 
     # get the current user's payment methods
-    db_connection = mysql.connection
-    db_cursor = db_connection.cursor()
+    # db_connection = mysql.connection
+    # db_cursor = db_connection.cursor()
 
-    db_cursor.execute(f'''
-                            SELECT payment_method
-                            FROM customer_payment_method
-                            WHERE customerid = "{current_user.userid}"
-                       ''')
+    # db_cursor.execute(f'''
+    #                         SELECT payment_method
+    #                         FROM customer_payment_method
+    #                         WHERE customerid = "{current_user.userid}"
+    #                    ''')
 
-    payment_methods = db_cursor.fetchall()
-    db_cursor.close()
+    # payment_methods = db_cursor.fetchall()
+    # db_cursor.close()
 
     if request.method == "POST":
         if request.form['submitbutton'] == "name":
@@ -372,7 +373,7 @@ def account():
             return redirect(url_for("home"))  
     else:
         house_number = str(current_user.house_number)
-        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = payment_methods)
+        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
     
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
@@ -483,18 +484,19 @@ def payment_methods():
     # get the current user's payment methods
     db_connection = mysql.connection
     db_cursor = db_connection.cursor()
+    payment_methods = current_user.payment_methods
 
-    db_cursor.execute(f'''
-                            SELECT payment_method
-                            FROM customer_payment_method
-                            WHERE customerid = "{current_user.userid}"
-                       ''')
+    # db_cursor.execute(f'''
+    #                         SELECT payment_method
+    #                         FROM customer_payment_method
+    #                         WHERE customerid = "{current_user.userid}"
+    #                    ''')
 
-    payment_methods = db_cursor.fetchall()
+    #payment_methods = db_cursor.fetchall()
 
     # the user adds a payment method
     if form.validate_on_submit():
-        if form.add_payment_method.data != None and form.add_payment_method.data != '':
+        if form.add_payment_method.data != None and form.add_payment_method.data != 'Choose a payment method':
             db_cursor.execute(f'''
                                     INSERT IGNORE INTO customer_payment_method
                                     VALUES ("{current_user.userid}", "{form.add_payment_method.data}")
@@ -508,7 +510,7 @@ def payment_methods():
     # the user deletes a payment method
     elif request.method == "POST":
         for method in payment_methods:
-            if f"delete_{method[0]}" in request.form:
+            if f"delete_{method[0]}" in request.form and len(payment_methods) > 1:
                 db_connection = mysql.connection
                 db_cursor = db_connection.cursor()
 
@@ -520,9 +522,13 @@ def payment_methods():
                 db_connection.commit()
                 db_cursor.close()
                 return redirect(url_for("payment_methods"))
+            # elif len(payment_methods) == 1:
+            #     flash("No products ordered!")
+            #     db_cursor.close()
+            #     return redirect(url_for("payment_methods"))
 
     db_cursor.close()
-    return render_template('payment_method.jinja2', form = form, payment_methods = payment_methods)
+    return render_template('payment_method.jinja2', form = form, payment_methods = current_user.payment_methods)
 
 @app.before_request
 def initNavBar():
