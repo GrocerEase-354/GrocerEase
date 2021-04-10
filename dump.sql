@@ -1,3 +1,16 @@
+DROP TABLE IF EXISTS customer_payment_method;
+DROP TABLE IF EXISTS store_order;
+DROP TABLE IF EXISTS adds;
+DROP TABLE IF EXISTS product_in_shopping_cart;
+DROP TABLE IF EXISTS shopping_cart;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS seller;
+DROP TABLE IF EXISTS user;
+
+
+
 CREATE TABLE user (
     userid VARCHAR(20), 
     user_password CHAR(100) NOT NULL,
@@ -35,7 +48,7 @@ CREATE TABLE category (
 );
 
 CREATE TABLE product (
-    productid INT,
+    productid INT AUTO_INCREMENT,
     stock INT,
     product_description VARCHAR(1000),
     best_before_date DATE NOT NULL,
@@ -109,6 +122,24 @@ CREATE TABLE customer_payment_method (
 );
 
 DELIMITER $$
+
+CREATE TRIGGER OrderIdGeneration BEFORE INSERT ON store_order
+FOR EACH ROW
+    IF NEW.orderid IS NULL
+    THEN    SET NEW.orderid = (
+            SELECT MAX(orderid)
+            FROM store_order) + 1;
+     END IF;$$
+
+
+CREATE TRIGGER CartIdGeneration BEFORE INSERT ON shopping_cart
+FOR EACH ROW
+    IF NEW.cartid IS NULL
+    THEN  SET NEW.cartid = (
+          SELECT MAX(cartid)
+          FROM shopping_cart) + 1;
+    END IF;$$
+
 
 CREATE TRIGGER `user_insert_constraints` BEFORE INSERT ON `user`
 FOR EACH ROW  
@@ -250,16 +281,16 @@ DELIMITER ;
 
 /*User Table Entries*/
 INSERT INTO user VALUES
-('Y123','1234', 1,'152 Street','V3X123','BC', 'Surrey', 'Yogesh@shaw.ca'),
-('A123','5678', 2,'156 Street','V3X456','BC', 'Surrey', 'Andy@shaw.ca'),
-('H123','9101', 3,'158 Street','V3X789','BC', 'Surrey', 'Hareet@shaw.ca'),
-('J123','1112', 4,'160 Street','V3X101','BC', 'Surrey', 'Bob@shaw.ca'),
-('B123','1314', 5,'162 Street','V3X111','BC', 'Surrey', 'Brenden@shaw.ca'),
-('Micheal101','0987', 6,'160 Street','V3X112','BC', 'Surrey', 'Micheal@shaw.ca'),
-('Jim123','6543', 7,'162 Street','V3X113','BC', 'Surrey', 'Jim@shaw.ca'),
-('Dwight456','5432', 8,'164 Street','V3X114','BC', 'Surrey', 'Dwight@shaw.ca'),
-('Pam789','4321', 9,'166 Street','V3X115','BC', 'Surrey', 'Pam@shaw.ca'),
-('Mose112','7809', 10,'168 Street','V3X116','BC', 'Surrey', 'Mose@shaw.ca');
+('Y123','1234', 1,'152 Street','V3X123','British Columbia', 'Surrey', 'Yogesh@shaw.ca'),
+('A123','5678', 2,'156 Street','V3X456','British Columbia', 'Surrey', 'Andy@shaw.ca'),
+('H123','9101', 3,'158 Street','V3X789','British Columbia', 'Surrey', 'Hareet@shaw.ca'),
+('J123','1112', 4,'160 Street','V3X101','British Columbia', 'Surrey', 'Bob@shaw.ca'),
+('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brendan@shaw.ca'),
+('Micheal101','0987', 6,'160 Street','V3X112','British Columbia', 'Surrey', 'Micheal@shaw.ca'),
+('Jim123','6543', 7,'162 Street','V3X113','British Columbia', 'Surrey', 'Jim@shaw.ca'),
+('Dwight456','5432', 8,'164 Street','V3X114','British Columbia', 'Surrey', 'Dwight@shaw.ca'),
+('Pam789','4321', 9,'166 Street','V3X115','British Columbia', 'Surrey', 'Pam@shaw.ca'),
+('Mose112','7809', 10,'168 Street','V3X116','British Columbia', 'Surrey', 'Mose@shaw.ca');
 
 /*User Table Entries*/
 INSERT INTO customer VALUES
@@ -267,12 +298,12 @@ INSERT INTO customer VALUES
 ('A123','Andy','Lu'),
 ('H123','Hareet','Dhillon'),
 ('J123','Bob','HealthyGuy'),
-('B123','Brenden','Shaw');
+('B123','Brendan','Saw');
 
 /*Seller Table Entries*/
 INSERT INTO seller VALUES
 ('Jim123','Company 1'),
-('Dwight456','Dunder Miflin'),
+('Dwight456','Dunder Mifflin'),
 ('Pam789','Company 2'),
 ('Micheal101','Company 3'),
 ('Mose112','Company 4');
@@ -287,55 +318,80 @@ INSERT INTO category VALUES
 
 /*Product table entries*/
 INSERT INTO product VALUES
-(123,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
-(456,5,'A dozen fresh Carrots.','2021-4-25','Carrot',4.99,'Dwight456','Vegetables'),
-(789,5,'A fresh jug of milk.','2021-4-26','Milk',3.99,'Pam789','Dairy'),
-(101,5,'A whole chicken.','2021-4-24','Chicken',5.99,'Micheal101','Meat'),
-(112,5,'A fresh loaf of Bread.','2021-4-24','Bread',2.99,'Mose112','Bread');
+(101,5,'A fresh bunch of Bananas.','2021-04-24','Banana',2.99,'Jim123','Fruits'),
+(102,5,'A dozen fresh Apples.','2021-04-24','Apple',3.99,'Jim123','Fruits'),
+(103,5,'A bunch of fresh Grapes.','2021-04-24','Grape',4.99,'Jim123','Fruits'),
+(104,5,'A box of fresh Oranges.','2021-04-24','Orange',5.99,'Jim123','Fruits'),
+(105,5,'A box of fresh Peaches.','2021-04-24','Peach',6.99,'Jim123','Fruits'),
+
+(106,5,'A dozen fresh Beetroots.','2021-4-25','Beet',7.99,'Dwight456','Vegetables'),
+(107,5,'A dozen fresh Carrots.','2021-4-25','Carrot',8.99,'Dwight456','Vegetables'),
+(108,5,'A fresh bunch of Lettuce.','2021-4-25','Lettuce',9.99,'Dwight456','Vegetables'),
+(109,5,'A fresh Cauliflower.','2021-4-25','Cauliflower',10.99,'Dwight456','Vegetables'),
+(110,5,'Half-Dozen fresh Eggplant.','2021-4-25','Eggplant',11.99,'Dwight456','Vegetables'),
+
+(111,5,'A fresh jug of Milk.','2021-4-26','Milk',12.99,'Pam789','Dairy'),
+(112,5,'A fresh tub of Yogurt.','2021-4-26','Yogurt',13.99,'Pam789','Dairy'),
+(113,5,'A fresh wheel of Cheese.','2021-4-26','Cheese',13.99,'Pam789','Dairy'),
+(114,5,'A fresh tub of Ice Cream.','2021-4-26','Ice Cream',15.99,'Pam789','Dairy'),
+(115,5,'A fresh jug of Skim Milk.','2021-4-26','Skim Milk',16.99,'Pam789','Dairy'),
+
+(116,5,'A whole Chicken.','2021-4-27','Chicken',17.99,'Micheal101','Meat'),
+(117,5,'A whole Turkey.','2021-4-27','Turkey',18.99,'Micheal101','Meat'),
+(118,5,'A whole Salmon.','2021-4-27','Salmon',19.99,'Micheal101','Meat'),
+(119,5,'A whole Steak.','2021-4-27','Steak',20.99,'Micheal101','Meat'),
+(120,5,'A whole Goat.','2021-4-27','Goat',21.99,'Micheal101','Meat'),
+
+(121,5,'A fresh loaf of Bread.','2021-4-28','Bread',2.99,'Mose112','Bread'),
+(122,5,'A dozen fresh Cheese Buns.','2021-4-28','Cheese Buns',3.99,'Mose112','Bread'),
+(123,5,'A dozen fresh Croissants.','2021-4-28','Croissant',4.99,'Mose112','Bread'),
+(124,5,'A fresh loaf of Whole Wheat Bread.','2021-4-28','Whole Wheat Bread',5.99,'Mose112','Bread'),
+(125,5,'A fresh loaf of Gluten Free Bread.','2021-4-28','Gluten Free Bread',6.99,'Mose112','Bread');
 
 /*Store_order entries*/
 INSERT INTO store_order VALUES
-('Y123','100',2.99,'2021-2-20','Credit Card'),
-('Y123','101',4.99,'2021-2-25','Credit Card'),
-('Y123','102',3.99,'2021-2-26','Credit Card'),
-('Y123','103',2.99,'2021-2-27','Credit Card'),
+('Y123',100,2.99,'2021-2-20','Credit Card'),
+('Y123',101,4.99,'2021-2-25','Credit Card'),
+('Y123',102,3.99,'2021-2-26','Credit Card'),
+('Y123',103,2.99,'2021-2-27','Credit Card'),
 
-('A123','104',2.99,'2021-2-20','Credit Card'),
-('A123','105',3.99,'2021-2-21','Credit Card'),
-('A123','106',5.99,'2021-2-28','Credit Card'),
+('A123',104,2.99,'2021-2-20','Credit Card'),
+('A123',105,3.99,'2021-2-21','Credit Card'),
+('A123',106,5.99,'2021-2-28','Credit Card'),
 
-('H123','107',4.99,'2021-2-22','Debit Card'),
-('H123','108',2.99,'2021-2-25','Debit Card'),
+('H123',107,4.99,'2021-2-22','Debit Card'),
+('H123',108,2.99,'2021-2-25','Debit Card'),
 
-('J123','109',2.99,'2021-2-23','Debit Card'),
-('J123','110',2.99,'2021-2-24','Debit Card'),
+('J123',109,2.99,'2021-2-23','Debit Card'),
+('J123',110,2.99,'2021-2-24','Debit Card'),
 
-('B123','111',5.99,'2021-2-24','Debit Card');
+('B123',111,5.99,'2021-2-24','Debit Card'),
+('B123',112,1.99,'2021-2-25','Debit Card');
 
 
 /*Shopping_cart entries*/
-INSERT INTO shopping_cart VALUE
-    ('Y123',123),
-    ('A123',456),
-    ('H123',789),
-    ('J123',101),
-    ('B123',112);
+INSERT INTO shopping_cart VALUES
+    ('Y123',200),
+    ('A123',201),
+    ('H123',202),
+    ('J123',203),
+    ('B123',204);
 
 /*product_in_shopping_cart*/
 INSERT INTO product_in_shopping_cart VALUES
-    (123,'Y123',123,2),
-    (456,'Y123',123,2),
-    (789,'A123',456,2),
-    (101,'H123',789,2),
-    (112,'J123',101,2);
+    (101,'Y123',200,2),
+    (102,'A123',201,2),
+    (103,'H123',202,2),
+    (104,'J123',203,2),
+    (105,'B123',204,2);
 
 /*Adds entries*/
 INSERT INTO adds VALUES
-('Y123', 123),
-('Y123',456),
-('A123',789),
-('H123',101),
-('J123',112);
+('Y123', 101),
+('A123',102),
+('H123',103),
+('J123',104),
+('B123',105);
 
 /*customer_payment_method entries*/
 INSERT INTO customer_payment_method VAlUES

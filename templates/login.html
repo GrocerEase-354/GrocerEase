@@ -4,18 +4,14 @@
     Login
 {% endblock title %}
 
-{% block navbar %}
-{% endblock %}
-
 {% block content %}
-    <style>
-        *{margin:10px;}
-    </style>
+<div class="mainContent">
+
     <h1>Hello</h1>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
         <div class="alert alert-danger">
-            {{ messages[0] }}</a>.
+            <p>{{ messages[0] }}.</p>
         </div>
     {% endif %}
     {% endwith %}
@@ -51,10 +47,12 @@
             {% endif %}
         </div>
 
-        <label class="checkbox">
+        <label class="checkbox" style="padding-left: 25px;">
             <input type="checkbox">
             Remember me
         </label>
         <button name="login" class="btn btn-primary" type="submit">Login</button>
     </form>
+    
+</div>
 {% endblock %}

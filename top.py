@@ -414,15 +414,16 @@ def goToCategory(selected_category):
 @login_required
 def orders():
     cursor = mysql.connection.cursor()
-
-    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used 
-                      FROM store_order, customer
-                      WHERE customer.id = store_order.customerid AND customer.id = '{current_user.userid}'""")
-                      
+    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used  
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
     retVal = cursor.fetchall()
+    cursor.execute(f""" SELECT COUNT(*)
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
+    numOrders = cursor.fetchone()
     cursor.close()
-    print(retVal)
-    return render_template('orderHistory.jinja2', orders = retVal)
+    return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
 
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
@@ -497,10 +498,11 @@ def password():
         db_connection = mysql.connection
         db_cursor = db_connection.cursor()
         
-        if form.user_password.data != None and form.user_password.data != '':
+        if form.user_password.data != None and form.user_password.data != '' and form.user_password.data == form.confirm_user_password.data:
+            hashedpw = generate_password_hash(form.user_password.data, method='sha256')
             db_cursor.execute(f'''
                                     UPDATE user 
-                                    SET user_password = "{form.user_password.data}"
+                                    SET user_password = "{hashedpw}"
                                     WHERE userid = "{current_user.userid}"
                                ''')
 

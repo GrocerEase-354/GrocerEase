@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block content %} 
-<div class="mainContent">
-    <body>    
-    <h1>Order History</h1>
+
+    <h1>Transaction History</h1>
+    <p>Number of Transactions: {{ Ordercount[0] }}</p>
     <table class="table">
       <tr>
         <th>First Name</th>
@@ -27,8 +27,6 @@
     </tr>
     {%endfor%}
     </table>
-    </body>
 
-</div>
 
 {%endblock%}

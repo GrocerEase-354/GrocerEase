@@ -4,22 +4,12 @@
     Signup
 {% endblock title %}
 
-{% block navbar %}
-{% endblock %}
 
 {% block content %}
-    <style>
-        label, input, select, button, h1, .alert {
-            margin-left: 100px;
-            margin-top: 10px;
-            /*margin: 10px 0 0 100px;*/
-        }
-        
-    </style>
+<div class="mainContent">
 
-    <style link=""></style>
     <h1>Sign up</h1>
-    <div class="row">
+    <div class="row mainContent">
         <div style="width: 500px;">
             <form class="form-group" action="/signup" method="post">
                 {% with messages = get_flashed_messages() %}
@@ -91,7 +81,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="checkbox">
+                    <label class="checkbox" style="padding-left: 25px;">
                         <input type="checkbox">
                         Remember me
                     </label>
@@ -101,4 +91,5 @@
             </form>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -1,13 +1,6 @@
 {% extends "navbar.jinja2" %}
 {% block content %}
-    <style>
-        label, input, select, button, h1, table, .alert {
-            margin-left: 100px;
-            margin-top: 10px;
-            /*margin: 10px 0 0 100px;*/
-        }
-        
-    </style>
+<div class="mainContent">
 
     <style link=""></style>
     <h1>My Account</h1>
@@ -23,7 +16,7 @@
                 {% for method in payment_methods %}
                     <tr>
                         <td>{{method[0]}}</td>
-                        <td><form autocomplete="off" method="POST"><button name="delete_{{method[0]}}" type="submit">Delete</button></form></td>
+                        <td><form autocomplete="off" method="POST" style="margin-top: 10px;"><button name="delete_{{method[0]}}" type="submit" class="btn btn-danger" style="margin-left: 25px;">Delete</button></form></td>
                     </tr>
                 {% endfor %}
             </table>
@@ -51,4 +44,5 @@
             </form>
         </div>
     </div>
+</div>
 {% endblock content %}
