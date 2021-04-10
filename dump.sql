@@ -275,6 +275,20 @@ THEN
     SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
+
+CREATE TRIGGER `customer_payment_method_insert_constraints` BEFORE INSERT ON `customer_payment_method`
+FOR EACH ROW IF LENGTH(NEW.payment_method) <= 0 
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment method cannot be empty!';
+END IF;$$
+
+CREATE TRIGGER `customer_payment_method_update_constraints` BEFORE UPDATE ON `customer_payment_method`
+FOR EACH ROW IF LENGTH(NEW.payment_method) <= 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment method cannot be empty!';
+END IF;$$
 DELIMITER ;
 
 /*Populating the tables with tuples*/
@@ -285,7 +299,7 @@ INSERT INTO user VALUES
 ('A123','5678', 2,'156 Street','V3X456','British Columbia', 'Surrey', 'Andy@shaw.ca'),
 ('H123','9101', 3,'158 Street','V3X789','British Columbia', 'Surrey', 'Hareet@shaw.ca'),
 ('J123','1112', 4,'160 Street','V3X101','British Columbia', 'Surrey', 'Bob@shaw.ca'),
-('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brendan@shaw.ca'),
+('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brenden@shaw.ca'),
 ('Micheal101','0987', 6,'160 Street','V3X112','British Columbia', 'Surrey', 'Micheal@shaw.ca'),
 ('Jim123','6543', 7,'162 Street','V3X113','British Columbia', 'Surrey', 'Jim@shaw.ca'),
 ('Dwight456','5432', 8,'164 Street','V3X114','British Columbia', 'Surrey', 'Dwight@shaw.ca'),
@@ -298,7 +312,7 @@ INSERT INTO customer VALUES
 ('A123','Andy','Lu'),
 ('H123','Hareet','Dhillon'),
 ('J123','Bob','HealthyGuy'),
-('B123','Brendan','Saw');
+('B123','Brenden','Shaw');
 
 /*Seller Table Entries*/
 INSERT INTO seller VALUES
