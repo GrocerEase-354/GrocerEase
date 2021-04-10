@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = '10.0.2.2'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
@@ -403,19 +403,6 @@ def orders():
 @login_required
 def account():
 
-    # get the current user's payment methods
-    # db_connection = mysql.connection
-    # db_cursor = db_connection.cursor()
-
-    # db_cursor.execute(f'''
-    #                         SELECT payment_method
-    #                         FROM customer_payment_method
-    #                         WHERE customerid = "{current_user.userid}"
-    #                    ''')
-
-    # payment_methods = db_cursor.fetchall()
-    # db_cursor.close()
-
     if request.method == "POST":
         if request.form['submitbutton'] == "name":
             return redirect(url_for("name"))
@@ -427,11 +414,13 @@ def account():
             return redirect(url_for("address"))
         elif request.form['submitbutton'] == "payment_methods":
             return redirect(url_for("payment_methods"))
-        elif (request.form['submitbutton'] == "home"):
-            return redirect(url_for("home"))  
-    else:
-        house_number = str(current_user.house_number)
-        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
+        elif request.form['submitbutton'] == "home":
+            return redirect(url_for("home"))
+        elif request.form['submitbutton'] == "delete_account":
+            return redirect(url_for("delete_account"))
+
+    house_number = str(current_user.house_number)
+    return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
     
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
@@ -545,14 +534,6 @@ def payment_methods():
     db_cursor = db_connection.cursor()
     payment_methods = current_user.payment_methods
 
-    # db_cursor.execute(f'''
-    #                         SELECT payment_method
-    #                         FROM customer_payment_method
-    #                         WHERE customerid = "{current_user.userid}"
-    #                    ''')
-
-    #payment_methods = db_cursor.fetchall()
-
     # the user adds a payment method
     if form.validate_on_submit():
         if form.add_payment_method.data != None and form.add_payment_method.data != 'Choose a payment method':
@@ -581,13 +562,32 @@ def payment_methods():
                 db_connection.commit()
                 db_cursor.close()
                 return redirect(url_for("payment_methods"))
-            # elif len(payment_methods) == 1:
-            #     flash("No products ordered!")
-            #     db_cursor.close()
-            #     return redirect(url_for("payment_methods"))
 
     db_cursor.close()
     return render_template('payment_method.jinja2', form = form, payment_methods = current_user.payment_methods)
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    if request.method == "POST":
+        if request.form['submitbutton'] == "delete_account":
+            current_user_id = current_user.userid
+            logout_user()
+            db_connection = mysql.connection
+            db_cursor = db_connection.cursor()
+
+            db_cursor.execute(f'''
+                                    DELETE FROM user
+                                    WHERE userid = %(parameterId)s
+                               ''', {'parameterId': current_user_id})
+
+            db_connection.commit()
+            db_cursor.close()
+            return redirect(url_for("logged_out"))
+        elif request.form['submitbutton'] == "back_to_account":
+            return redirect(url_for("account"))
+
+    return render_template('delete_account.jinja2')
 
 @app.before_request
 def initNavBar():
