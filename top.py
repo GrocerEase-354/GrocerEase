@@ -494,10 +494,11 @@ def password():
         db_connection = mysql.connection
         db_cursor = db_connection.cursor()
         
-        if form.user_password.data != None and form.user_password.data != '':
+        if form.user_password.data != None and form.user_password.data != '' and form.user_password.data == form.confirm_user_password.data:
+            hashedpw = generate_password_hash(form.user_password.data, method='sha256')
             db_cursor.execute(f'''
                                     UPDATE user 
-                                    SET user_password = "{form.user_password.data}"
+                                    SET user_password = "{hashedpw}"
                                     WHERE userid = "{current_user.userid}"
                                ''')
 
