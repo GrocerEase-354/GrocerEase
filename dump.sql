@@ -299,7 +299,7 @@ INSERT INTO user VALUES
 ('A123','5678', 2,'156 Street','V3X456','British Columbia', 'Surrey', 'Andy@shaw.ca'),
 ('H123','9101', 3,'158 Street','V3X789','British Columbia', 'Surrey', 'Hareet@shaw.ca'),
 ('J123','1112', 4,'160 Street','V3X101','British Columbia', 'Surrey', 'Bob@shaw.ca'),
-('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brenden@shaw.ca'),
+('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brendan@shaw.ca'),
 ('Micheal101','0987', 6,'160 Street','V3X112','British Columbia', 'Surrey', 'Micheal@shaw.ca'),
 ('Jim123','6543', 7,'162 Street','V3X113','British Columbia', 'Surrey', 'Jim@shaw.ca'),
 ('Dwight456','5432', 8,'164 Street','V3X114','British Columbia', 'Surrey', 'Dwight@shaw.ca'),
@@ -312,7 +312,7 @@ INSERT INTO customer VALUES
 ('A123','Andy','Lu'),
 ('H123','Hareet','Dhillon'),
 ('J123','Bob','HealthyGuy'),
-('B123','Brenden','Shaw');
+('B123','Brendan','Saw');
 
 /*Seller Table Entries*/
 INSERT INTO seller VALUES
