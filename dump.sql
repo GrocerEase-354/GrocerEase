@@ -294,17 +294,20 @@ DELIMITER ;
 /*Populating the tables with tuples*/
 
 /*User Table Entries*/
+
+/* Y123, A123, H123, J123, and B123's passwords are the same as their usernames*/
+/* do not log into sellers (all their passwords are "password")*/
 INSERT INTO user VALUES
-('Y123','1234', 1,'152 Street','V3X123','British Columbia', 'Surrey', 'Yogesh@shaw.ca'),
-('A123','5678', 2,'156 Street','V3X456','British Columbia', 'Surrey', 'Andy@shaw.ca'),
-('H123','9101', 3,'158 Street','V3X789','British Columbia', 'Surrey', 'Hareet@shaw.ca'),
-('J123','1112', 4,'160 Street','V3X101','British Columbia', 'Surrey', 'Bob@shaw.ca'),
-('B123','1314', 5,'162 Street','V3X111','British Columbia', 'Surrey', 'Brendan@shaw.ca'),
-('Micheal101','0987', 6,'160 Street','V3X112','British Columbia', 'Surrey', 'Micheal@shaw.ca'),
-('Jim123','6543', 7,'162 Street','V3X113','British Columbia', 'Surrey', 'Jim@shaw.ca'),
-('Dwight456','5432', 8,'164 Street','V3X114','British Columbia', 'Surrey', 'Dwight@shaw.ca'),
-('Pam789','4321', 9,'166 Street','V3X115','British Columbia', 'Surrey', 'Pam@shaw.ca'),
-('Mose112','7809', 10,'168 Street','V3X116','British Columbia', 'Surrey', 'Mose@shaw.ca');
+('Y123','sha256$lYs8Fdwv$9e7828f2e6ddd18714b9cfd4098fc3990aee3d36c32dcc31a646b09b07b86a1b', 1,'152 Street','V3X123','BC', 'Surrey', 'Yogesh@shaw.ca'),
+('A123','sha256$R1CTQ4w4$4542c56c2a05c4acf8ce43666648d547859e27e795e5a8331b57186ce2e2248b', 2,'156 Street','V3X456','BC', 'Surrey', 'Andy@shaw.ca'),
+('H123','sha256$39BV4fBA$3fdd20f8e4c31a391b13aa9b3edec5a464d31e8e0dfc6946e345b734a440adbe', 3,'158 Street','V3X789','BC', 'Surrey', 'Hareet@shaw.ca'),
+('J123','sha256$MCw1gqXD$1eafaa15d9310f6d9c43068a5f7ab71fc7a3a8ed902b963772779b2b661ba44d', 4,'160 Street','V3X101','BC', 'Surrey', 'Bob@shaw.ca'),
+('B123','sha256$oUmFWhhQ$811206646627b55b2af00ece0f62218e8c2803f350605a7e4c5f28899257353e', 5,'162 Street','V3X111','BC', 'Surrey', 'Brendan@shaw.ca'),
+('Micheal101','sha256$oPFc4lyT$b55f31a01fd903698e30bd91d97ba65a8e00fb9944d6d895dde796f9b37b70c7', 6,'160 Street','V3X112','BC', 'Surrey', 'Micheal@shaw.ca'),
+('Jim123','sha256$oPFc4lyT$b55f31a01fd903698e30bd91d97ba65a8e00fb9944d6d895dde796f9b37b70c7', 7,'162 Street','V3X113','BC', 'Surrey', 'Jim@shaw.ca'),
+('Dwight456','sha256$oPFc4lyT$b55f31a01fd903698e30bd91d97ba65a8e00fb9944d6d895dde796f9b37b70c7', 8,'164 Street','V3X114','BC', 'Surrey', 'Dwight@shaw.ca'),
+('Pam789','sha256$oPFc4lyT$b55f31a01fd903698e30bd91d97ba65a8e00fb9944d6d895dde796f9b37b70c7', 9,'166 Street','V3X115','BC', 'Surrey', 'Pam@shaw.ca'),
+('Mose112','sha256$oPFc4lyT$b55f31a01fd903698e30bd91d97ba65a8e00fb9944d6d895dde796f9b37b70c7', 10,'168 Street','V3X116','BC', 'Surrey', 'Mose@shaw.ca');
 
 /*User Table Entries*/
 INSERT INTO customer VALUES
