@@ -130,6 +130,10 @@ def signup_post():
 
     #session['user'] = user_obj
     try:
+        if len(password) < 1 or len(password) > 100:
+            flash("Password must be between 1 and 100 characters long!")
+            raise MySQLdb.OperationalError
+            
         # add user to DB
         cursor.execute(f"""INSERT INTO user (`userid`, `user_password`, `house_number`, `street_name`, `postal_code`, `province`, `city`, `email`)
                         VALUES('{username}', '{generate_password_hash(password, method='sha256')}', '{house_number}', '{street_name}', '{postal_code}', '{province}', '{city}', '{email}')""")

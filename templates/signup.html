@@ -25,13 +25,17 @@
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="alert alert-danger">
-                            {% if message[-1] == '!' %}
-                                {{ message }}
-                            {% else %}
-                                {{ message }}. Go to <a href="{{ url_for('login') }}">login page</a>.
-                            {% endif %}
-                        </div>
+                        {% if message %}
+                            <div class="alert alert-danger">
+                                
+                                    {% if message[-1] == '!' %}
+                                        {{ message }}
+                                    {% else %}
+                                        {{ message }}. Go to <a href="{{ url_for('login') }}">login page</a>.
+                                    {% endif %}
+                                
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 {% endif %}
                 {% endwith %}
