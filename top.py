@@ -18,7 +18,7 @@ bootstrap = Bootstrap(app)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
 app.config['SECRET_KEY'] = 'test'
 
