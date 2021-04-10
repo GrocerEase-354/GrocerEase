@@ -12,8 +12,8 @@ class SellerCompanyNameForm(FlaskForm):
     submit = SubmitField('Save Changes')
 
 class PasswordForm(FlaskForm):
-    user_password = PasswordField('Password', validators=[Length(min=1, max=100), Optional()])
-    confirm_user_password = PasswordField('Confirm Password', validators=[Length(min=1, max=100), EqualTo('user_password'), Optional()])
+    user_password = PasswordField('New Password', validators=[Length(min=1, max=100), Optional()])
+    confirm_user_password = PasswordField('Confirm New Password', validators=[Length(min=1, max=100), EqualTo('user_password'), Optional()])
     submit = SubmitField('Save Changes')
 
 class EmailForm(FlaskForm):
