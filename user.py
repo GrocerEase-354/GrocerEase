@@ -1,7 +1,6 @@
 from flask_login import UserMixin
 from flask_mysqldb import MySQL
 
-
 mysql = MySQL()
 
 class User(UserMixin):

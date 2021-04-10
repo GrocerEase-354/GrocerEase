@@ -4,6 +4,8 @@
 {% endblock title %}
 
 {% block content  %}
+
+<div class="mainContent">
 <h1>
     Order Summary
 </h1>
@@ -43,6 +45,4 @@ Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
         </td>
     </tr>
 </table>
-
-
 {% endblock content %}

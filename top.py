@@ -8,9 +8,11 @@ from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import date
 from useraccountforms import CustomerNameForm, SellerCompanyNameForm, PasswordForm, EmailForm, AddressForm, PaymentMethodForm
+from login_signup_forms import LoginForm, SignupForm
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, Optional
+import MySQLdb
 
 app = Flask(__name__)
 
@@ -75,7 +77,8 @@ def load_user(user_id):
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    login_form = LoginForm()
+    return render_template('login.html', form=login_form)
 
 @app.route('/signup')
 def signup():
@@ -126,16 +129,33 @@ def signup_post():
     )
 
     #session['user'] = user_obj
+    try:
+        # add user to DB
+        cursor.execute(f"""INSERT INTO user (`userid`, `user_password`, `house_number`, `street_name`, `postal_code`, `province`, `city`, `email`)
+                        VALUES('{username}', '{generate_password_hash(password, method='sha256')}', '{house_number}', '{street_name}', '{postal_code}', '{province}', '{city}', '{email}')""")
+        # add customer to DB
+        cursor.execute(f"""INSERT INTO customer (id, first_name, last_name)
+                        VALUES('{username}', '{fname}', '{lname}')""")
+        cursor.execute(f"""INSERT INTO customer_payment_method (customerid, payment_method)
+                        VALUES('{username}', '{payment_method}')""")
+        # add cart to DB
+        cursor.execute(f"""INSERT INTO shopping_cart (customerid)
+                           VALUES('{username}')""")
+        mysql.connection.commit()
 
-    # add user to DB
-    cursor.execute(f"""INSERT INTO user (`userid`, `user_password`, `house_number`, `street_name`, `postal_code`, `province`, `city`, `email`)
-                       VALUES('{username}', '{generate_password_hash(password, method='sha256')}', '{house_number}', '{street_name}', '{postal_code}', '{province}', '{city}', '{email}')""")
-    # add customer to DB
-    cursor.execute(f"""INSERT INTO customer (id, first_name, last_name)
-                       VALUES('{username}', '{fname}', '{lname}')""")
-    cursor.execute(f"""INSERT INTO customer_payment_method (customerid, payment_method)
-                       VALUES('{username}', '{payment_method}')""")
-    mysql.connection.commit()
+    except MySQLdb.OperationalError as e:
+        print(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
+        flash(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
+        return render_template("signup.html", username=username,
+                                            house_number=house_number,
+                                            street_name=street_name,
+                                            postal_code=postal_code,
+                                            city=city,
+                                            email=email,
+                                            fname=fname,
+                                            lname=lname)
+
+
     cursor.close()
 
     # code to validate and add user to database goes here
@@ -143,23 +163,35 @@ def signup_post():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    remember = True if request.form.get('remember') else False
+    login_form = LoginForm()
+    if login_form.validate_on_submit(): 
+        username = ""
+        password = ""
+        for field in login_form:
+            if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
+                if field.name == 'username':
+                    username = field.data
+                elif field.name == 'password':
+                    password = field.data
+        remember = True if request.form.get('remember') else False
 
-    cursor = mysql.connection.cursor()
-    # see if user is in DB
-    cursor.execute(f"""SELECT * FROM user WHERE userid='{username}'""")
-    user = cursor.fetchall()
-    cursor.close()
-    print(user)
-    if not user or (not check_password_hash(user[0][1], password) and user[0][1] != password): # if a user is found, we want to redirect back to signup page so user can try again
-        flash("Username/Password is invalid")
-        return redirect(url_for('login'))
-    user2 = create_user(user[0][0])
-    print("Jello")
-    login_user(user2, remember=remember)
-    return redirect(url_for('profile'))
+        cursor = mysql.connection.cursor()
+        # see if user is in DB
+        cursor.execute(f"""SELECT * FROM user WHERE userid='{username}'""")
+        user = cursor.fetchall()
+        cursor.close()
+        print(user)
+        if not user or (not check_password_hash(user[0][1], password) and user[0][1] != password): # if a user is found, we want to redirect back to signup page so user can try again
+            flash("Username/Password is invalid")
+            return redirect(url_for('login'))
+        user2 = create_user(user[0][0])
+        print("Jello")
+        login_user(user2, remember=remember)
+        return redirect(url_for('home'))
+
+    return render_template('login.html', form=login_form)
+
+
 
 @app.route('/logout')
 @login_required
@@ -187,7 +219,7 @@ def shopping_cart():
     user = current_user
 
     # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
+    cursor.execute(f'''SELECT P.product_name, P.productid, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
                        FROM product_in_shopping_cart AS PSC, product AS P 
                        WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
     products = cursor.fetchall()
@@ -209,27 +241,36 @@ def shopping_cart():
                 return redirect(url_for("checkout"))
         for p in products:
             #print(f"delete_{p[0]}")
-            if f"delete_{p[0]}" in request.form:
+            if f"delete_{p[1]}" in request.form:
                 cursor = mysql.connection.cursor()
                 cursor.execute(f'''DELETE FROM product_in_shopping_cart
-                                   WHERE customerid="{user.userid}" AND productid IN (
-                                       SELECT productid
-                                       FROM product
-                                       WHERE product_name="{p[0]}");''')
+                                   WHERE customerid="{user.userid}" AND productid = '{p[1]}';''')
                 mysql.connection.commit()
                 cursor.close()
-                print(f"deleting {p[0]}")
+                print(f"deleting {p[1]}")
                 return redirect(url_for("redirect_on_delete"))
 
+
     cursor = mysql.connection.cursor() 
-    # get the items in the cart
-    cursor.execute(f'''SELECT P.product_name, PSC.quantity, P.price, P.price*PSC.quantity AS total_price
-                       FROM product_in_shopping_cart AS PSC, product AS P 
-                       WHERE customerid="{user.userid}" AND PSC.productid = P.productid;''')
-    products = cursor.fetchall()
+
+    #calculating healthy choice
+    cursor.execute(f''' SELECT COUNT(*) 
+                        FROM customer A 
+                        WHERE A.id = '{ user.userid }' AND A.id IN (
+                            SELECT B.id 
+                            FROM customer B
+                            WHERE NOT EXISTS (
+                                SELECT category_name FROM category
+                                WHERE category_name NOT IN (SELECT product.category_name 
+                                                            FROM product_in_shopping_cart, product 
+                                                            WHERE product_in_shopping_cart.productid = product.productid AND product_in_shopping_cart.customerid = B.id)))
+                    ''')
+    isHealthyChoice = cursor.fetchone()[0]
+    print(isHealthyChoice)
     cursor.close()
 
-    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user)
+    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
+
 
 @app.route("/redirect")
 @login_required
@@ -252,17 +293,11 @@ def checkout():
                 ts = date.today()
 
                 cursor = mysql.connection.cursor()
-
-                cursor.execute(f"""SELECT orderid FROM store_order GROUP BY orderid ORDER BY orderid DESC""")
-
-                orderID = cursor.fetchall()[0][0]+1
-
+                       
                 subtotal = session['subtotal']
 
-                print(orderID)
-
-                cursor.execute(f"""INSERT INTO store_order (`customerid`, `orderid`, `cost`, `order_time`, `payment_method_used`)
-                                VALUES ('{user.userid}', {orderID}, {subtotal*1.12}, '{ts}', '{payment_method}')""")
+                cursor.execute(f"""INSERT INTO store_order (`customerid`, `cost`, `order_time`, `payment_method_used`)
+                                VALUES ('{user.userid}', {subtotal*1.12}, '{ts}', '{payment_method}')""")
                 mysql.connection.commit()
 
                 cursor.execute(f"""DELETE FROM product_in_shopping_cart
@@ -289,7 +324,11 @@ def order_confirmed():
     # TODO: Fix orderID incrementing
     ts = date.today()
 
-    orderID = session['orderID']
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"""SELECT MAX(orderid)
+                    FROM store_order
+                    WHERE customerid='{current_user.userid}'""") 
+    orderID = cursor.fetchall()[0][0]
 
     if request.method == "POST":
         if "home" in request.form:
@@ -306,6 +345,16 @@ def profile():
 def logged_out():
     return render_template("logged_out.html", user=current_user)
 
+@app.route("/categories")
+def categories():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT category_name, COUNT(*) FROM product GROUP BY category_name")
+    retVal = cursor.fetchall()
+    cursor.execute("SELECT COUNT(*) FROM product")
+    total = cursor.fetchall()
+    cursor.close()
+    return render_template("overview.jinja2", retVal = retVal, total = total)
+
 @app.route("/category/<selected_category>", methods=['GET', 'POST'])
 @login_required
 def goToCategory(selected_category):
@@ -313,7 +362,7 @@ def goToCategory(selected_category):
     if (actualSelectedCategory == "all"):
         actualSelectedCategory = "%"
     cursor = mysql.connection.cursor()
-    productsToSelect = "product_name, price, sellerid, product_description, category_name, best_before_date"
+    productsToSelect = "product_name, price, sellerid, product_description, category_name, best_before_date, productid"
     # preventing SQL injection from URL
     cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
@@ -329,13 +378,43 @@ def goToCategory(selected_category):
     if (request.method == "POST"):
         if (request.form['submitbutton'] == "home"):
             return redirect(url_for("home"))
+        else:
+            cursor2 = mysql.connection.cursor()
+            cursor2.execute(f"SELECT cartid FROM shopping_cart WHERE customerid = '{current_user.userid}'")
+            cartid = cursor2.fetchall()[0][0]
+
+            checkexist = f"SELECT productid, customerid, cartid FROM product_in_shopping_cart WHERE productid='{request.form['submitbutton']}' AND customerid='{ current_user.userid }' AND cartid = '{ cartid }' "
+            cursor2.execute(checkexist)
+            checkexistret = cursor2.fetchall()
+            if (checkexistret):
+                updatebyone = f'''UPDATE product_in_shopping_cart SET quantity = quantity + 1 
+                            WHERE product_in_shopping_cart.productid IN (
+                            SELECT * FROM (SELECT B.productid FROM product_in_shopping_cart A 
+                            INNER JOIN product_in_shopping_cart B ON A.productid = B.productid WHERE A.productid = {request.form['submitbutton']} 
+                            AND A.customerid = '{ current_user.userid }' AND A.cartid = { cartid }) as temp)'''
+                cursor2.execute(updatebyone)
+                mysql.connection.commit()
+            else:
+                commitmsg = f"INSERT INTO product_in_shopping_cart VALUES({request.form['submitbutton']}, '{ current_user.userid }', { cartid }, 1)"
+                cursor2.execute(commitmsg)
+                mysql.connection.commit()
+            
+            cursor2.close()
+
+            
+            return redirect(url_for("goToCategory", selected_category = selected_category))
     else:      
         return render_template("category.jinja2", selected_category=selected_category, retVal=retVal)
 
 @app.route("/orders")
+@login_required
 def orders():
     cursor = mysql.connection.cursor()
-    cursor.execute('''SELECT first_name, last_name, orderid, product_name, cost, order_time, payment_method_used  FROM store_order, customer,product WHERE customer.id = store_order.customerid AND store_order.cost = product.price''')
+
+    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used 
+                      FROM store_order, customer
+                      WHERE customer.id = store_order.customerid AND customer.id = '{current_user.userid}'""")
+                      
     retVal = cursor.fetchall()
     cursor.close()
     print(retVal)
@@ -539,24 +618,29 @@ def initNavBar():
         topbar.items.append(View("Login", "login"))
         topbar.items.append(View("Sign Up", "signup"))
     else:
-        topbar.items.append(View("Logout", "logout"))
-        topbar.items.append(View("Profile", "profile"))
-        topbar.items.append(View("My Account", "account"))
-        topbar.items.append(View("Shopping Cart", "shopping_cart"))
-        topbar.items.append(View("Order History", "orders"))
-        topbar.items.append(Text(current_user.userid))
-        
-        topbar.items.append(View("All", "goToCategory", selected_category = "All"))
-
         cursor = mysql.connection.cursor()
+        cursor.execute(f"""SELECT SUM(quantity) AS total_items FROM product_in_shopping_cart WHERE customerid='{current_user.userid}'""")
+        shopping_cart_items_count = cursor.fetchall()[0][0]
+
         cursor.execute('''SELECT category_name FROM category''')
         retVal = cursor.fetchall()
         cursor.close()
         #topbar.items.append(View("Hello", "home"))
-        
+        items = []
+        items.append(View("Overview", "categories"))
+        items.append(View("All", "goToCategory", selected_category = "All"))
         for i in retVal:
             j = ''.join(i)  # to get the string
-            topbar.items.append(View(j, "goToCategory", selected_category = j))
+            items.append(View(j, "goToCategory", selected_category = j))
+        topbar.items.append(Subgroup("Categories", *items))
 
+        topbar.items.append(View(f"Shopping Cart{'' if not shopping_cart_items_count or int(shopping_cart_items_count) <= 0 else f' ({shopping_cart_items_count})'}", "shopping_cart"))
+        topbar.items.append(View("Order History", "orders"))
+
+
+        topbar.items.append(Text("Logged in as " + current_user.userid))
+        topbar.items.append(View("Logout", "logout"))
+        topbar.items.append(View("My Account", "account"))
+    
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)

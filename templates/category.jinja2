@@ -4,7 +4,7 @@
 {% endblock title%}
 
 {% block content %}
-
+<div class="mainContent">
 
 <h1>Category Selected: {{ selected_category }}</h1>
 
@@ -28,22 +28,31 @@
         <th>
             Best Before
         </th>
+        <th>
+            Add to Cart
+        </th>
     </tr>
     {% for i in retVal %}
     <tr>
-        {% for j in i %}
+        {% for j in i[0:-1] %}
         <td>
             {{ j }}
         </td>
         {% endfor %}
+        {% for j in [i[-1]] %}
+        <td>
+            <form method="post"><button type="submit" name="submitbutton" value={{ j }} class="btn btn-warning">🛒</button></form>
+        </td>
+        {% endfor %}
+        
     </tr>
 
     {% endfor %}
 </table>
 
-<form method="post"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
+<form method="post"><button type="submit" name="submitbutton" value="home" class="btn btn-danger">Return back to home</button></form>
 
 
-
+</div>
 {% endblock content %}
 

@@ -5,13 +5,19 @@
 {% endblock title %}
 
 {% block content %}
-    <form method="POST">
-        <button name="sc" type="submit">Back to Index</button>
-    </form>
+<div class="mainContent">
+
     <h1>
         {{user.fname + " " + user.lname}}'s Shopping Cart
     </h1>
-    <table>
+
+
+    {% if isHealthyChoice %}
+    <h2>🥑<span class="rainbow-text">Healthy Choice!</span>🌶️</h2>
+    {% endif %}
+
+    <table class="table">
+
         <thead>
             <tr>
                 <td>Item Name</td>
@@ -21,13 +27,13 @@
                 <td></td>
             </tr>
         </thead>
-        {% for pname, qty, price, totalPrice in items %}
+        {% for pname, pid, qty, price, totalPrice in items %}
             <tr>
                 <td>{{pname}}</td>
                 <td>{{qty}}</td>
                 <td>{{price}}</td>
                 <td>{{totalPrice}}</td>
-                <td><form autocomplete="off" method="POST"><button name="delete_{{pname}}" type="submit">Delete</button></form></td>
+                <td><form autocomplete="off" method="POST"><button name="delete_{{pid}}" type="submit" class="btn btn-danger">Delete</button></form></td>
             </tr>
         {% endfor %}
     </table>
@@ -36,7 +42,7 @@
     Taxes: {{"$%.2f"|format(subtotal|float()*0.12)}} <br>
     Total: {{"$%.2f"|format(subtotal|float()*1.12)}}
     <form method="post">
-        <button name="checkout" type="submit">Proceed To Checkout</button>
+        <button name="checkout" type="submit" class="btn btn-secondary">Proceed To Checkout</button>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -46,4 +52,5 @@
     {% endif %}
     {% endwith %}
 
+</div>
 {% endblock content %}

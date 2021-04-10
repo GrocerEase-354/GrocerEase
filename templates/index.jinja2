@@ -1,5 +1,38 @@
 {% extends "navbar.jinja2" %}
+
+{% block title %}
+    Home
+{% endblock title %}
+
 {% block content %}
-<a href="{{ url_for('shopping_cart') }}">Shopping Cart</a>
+
+<div class="mainContent">
+    <section>
+        <h1>Welcome to <span class="logo-colour">GrocerEase</span></h1>
+        <h3>{{ user.fname + " " + user.lname }}'s dashboard</h1>
+        <p>Click on the navigation bar at the top to view listed items, 
+        view and edit your shopping cart, checkout, and view order history!</p>
+
+        <p>Also, if you wish, you can change current account data by visiting 
+        My Account, or log out of your account with the Logout button.</p>
+    </section>
+    
+    <section>
+        <h3>Created By</h3>
+        <ul>
+            <li>Andy</li>
+            <li>Brendan</li>
+            <li>Hareet</li>
+            <li>Yogesh</li>
+        <ul>
+
+    </section>
+    
+
+
+
+
+
+</div>
 
 {% endblock content %}
