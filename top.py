@@ -410,15 +410,16 @@ def goToCategory(selected_category):
 @login_required
 def orders():
     cursor = mysql.connection.cursor()
-
-    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used 
-                      FROM store_order, customer
-                      WHERE customer.id = store_order.customerid AND customer.id = '{current_user.userid}'""")
-                      
+    cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used  
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
     retVal = cursor.fetchall()
+    cursor.execute(f""" SELECT COUNT(*)
+                        FROM store_order, customer
+                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
+    numOrders = cursor.fetchone()
     cursor.close()
-    print(retVal)
-    return render_template('orderHistory.jinja2', orders = retVal)
+    return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
 
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
