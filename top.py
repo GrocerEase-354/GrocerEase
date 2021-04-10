@@ -210,14 +210,6 @@ def logout():
 
 @app.route("/")
 def home():
-    cursor = mysql.connection.cursor()
-    # get the first user
-    cursor.execute('''SELECT * FROM customer;''')
-    users = cursor.fetchall()
-    user = users[0]
-    session['user'] = user
-    session['orderID'] = 999
-    cursor.close()
     return render_template("index.jinja2", user=current_user if current_user.is_authenticated else None)
 
 @app.route("/shopping_cart", methods=["GET", "POST"])
