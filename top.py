@@ -190,7 +190,7 @@ def login_post():
         user = cursor.fetchall()
         cursor.close()
         print(user)
-        if not user or (not check_password_hash(user[0][1], password) and user[0][1] != password): # if a user is found, we want to redirect back to signup page so user can try again
+        if not user or (not check_password_hash(user[0][1], password)): # if a user is found, we want to redirect back to signup page so user can try again
             flash("Username/Password is invalid")
             return redirect(url_for('login'))
         user2 = create_user(user[0][0])
