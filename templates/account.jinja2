@@ -1,0 +1,146 @@
+{% extends "navbar.jinja2" %}
+
+{% block content %}
+    <style>
+        h1 {
+            margin-left: 100px;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-left: 100px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: [line1] 1fr [line2] 1fr [line3];
+            grid-template-rows: [line1] 1fr [line2] 1fr [line3] 1fr [line4] 1.7fr [line5];
+            margin-left: 86px;
+        }
+
+        .name_info {
+            grid-column-start: line1;
+            grid-column-end: line2;
+            grid-row-start: line1;
+            grid-row-end: line2;
+        }
+
+        .name_edit {
+            grid-column-start: line2;
+            grid-column-end: line3;
+            grid-row-start: line1;
+            grid-row-end: line2;
+        }
+
+        .password_info {
+            grid-column-start: line1;
+            grid-column-end: line2;
+            grid-row-start: line2;
+            grid-row-end: line3;
+        }
+
+        .password_edit {
+            grid-column-start: line2;
+            grid-column-end: line3;
+            grid-row-start: line2;
+            grid-row-end: line3;
+        }
+
+        .email_info {
+            grid-column-start: line1;
+            grid-column-end: line2;
+            grid-row-start: line3;
+            grid-row-end: line4;
+        }
+
+        .email_edit {
+            grid-column-start: line2;
+            grid-column-end: line3;
+            grid-row-start: line3;
+            grid-row-end: line4;
+        }
+
+        .address_and_payment_info {
+            grid-column-start: line1;
+            grid-column-end: line2;
+            grid-row-start: line4;
+            grid-row-end: line5;
+        }
+
+        .address_and_payment_edit {
+            grid-column-start: line2;
+            grid-column-end: line3;
+            grid-row-start: line4;
+            grid-row-end: line5;
+        }
+    </style>
+
+    <h1>My Account</h1>
+
+    <div class="container">
+        <div class="name_info">
+            <b>Full Name:</b>
+            <br>
+            {{user.fname + " " + user.lname}}
+        </div>
+        <div class="name_edit">
+            <form method="POST"><button type="submit" name="submitbutton" value="name" class="btn btn-warning">Edit</button></form>
+        </div>
+
+        <div class="password_info">
+            <b>Password:</b> 
+            <br>
+            **********
+        </div>
+        <div class ="password_edit">
+            <form method="POST"><button type="submit" name="submitbutton" value="password" class="btn btn-warning">Edit</button></form>
+        </div>
+
+        <div class="email_info">
+            <b>Email:</b> 
+            <br>
+            {{user.email}}
+        </div>
+        <div class ="email_edit">
+            <form method="POST"><button type="submit" name="submitbutton" value="email" class="btn btn-warning">Edit</button></form>
+        </div>
+
+        <div class="address_and_payment_info">
+            <b>Address:</b> 
+            <br>
+            {{house_number + " " + user.street_name}}
+            <br>
+            {{user.city + ", " + user.province + " " + user.postal_code}}
+            <br>
+            <br>
+            <br>
+            <br>
+            <b>Payment Methods:</b>
+            <br>
+            {% for method in payment_methods %}
+                {{method[0]}}
+                <br>
+            {% endfor %}
+        </div>
+        <div class ="address_and_payment_edit">
+            <form method="POST"><button type="submit" name="submitbutton" value="address" class="btn btn-warning">Edit</button></form
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <form method="POST"><button type="submit" name="submitbutton" value="payment_methods" class="btn btn-warning">Edit</button></form> 
+        </div>
+    </div>
+
+    <div> 
+        <br>
+        <br>
+        <form method="POST"><button type="submit" name="submitbutton" value="home" class="btn btn-warning">Return back to home</button></form>
+    </div>
+           
+{% endblock content %}
+
+
+
+

@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import date
-from useraccountforms import CustomerAccountForm, SellerAccountForm
+from useraccountforms import CustomerNameForm, SellerCompanyNameForm, PasswordForm, EmailForm, AddressForm, PaymentMethodForm
 from login_signup_forms import LoginForm, SignupForm
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = '10.0.2.2'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
@@ -57,7 +57,7 @@ def load_user(user_id):
         f"""SELECT payment_method
         FROM customer_payment_method
         WHERE customerid='{user_id}'""")
-    pm = cursor.fetchall()[0][0]
+    pm = cursor.fetchall()
 
     cursor.close()
     return User(
@@ -71,7 +71,7 @@ def load_user(user_id):
         email=em,
         fname=fn,
         lname=ln,
-        payment_method=pm
+        payment_methods=pm
     )
 
 
@@ -125,7 +125,7 @@ def signup_post():
         email=email,
         fname=fname,
         lname=lname,
-        payment_method=payment_method
+        payment_methods=(payment_method,)
     )
 
     #session['user'] = user_obj
@@ -281,7 +281,6 @@ def redirect_on_delete():
 @login_required
 def checkout(): 
     cursor = mysql.connection.cursor()
-
     user = current_user
 
     # get the subtotal
@@ -289,25 +288,27 @@ def checkout():
 
     if request.method == "POST":
         if "confirm" in request.form:
-            ts = date.today()
+            payment_method = request.form.get('payment_method')
+            if payment_method != "":
+                ts = date.today()
 
-            cursor = mysql.connection.cursor()
+                cursor = mysql.connection.cursor()
+                       
+                subtotal = session['subtotal']
 
-            subtotal = session['subtotal']
+                cursor.execute(f"""INSERT INTO store_order (`customerid`, `cost`, `order_time`, `payment_method_used`)
+                                VALUES ('{user.userid}', {subtotal*1.12}, '{ts}', '{payment_method}')""")
+                mysql.connection.commit()
 
-            cursor.execute(f"""INSERT INTO store_order (`customerid`, `cost`, `order_time`, `payment_method_used`)
-                            VALUES ('{user.userid}', {subtotal*1.12}, '{ts}', '{user.payment_method}')""")
-            mysql.connection.commit()
-
-            cursor.execute(f"""DELETE FROM product_in_shopping_cart
-                               WHERE customerid='{user.userid}'""")
-            mysql.connection.commit()
-            return redirect(url_for("order_confirmed"))
+                cursor.execute(f"""DELETE FROM product_in_shopping_cart
+                                WHERE customerid='{user.userid}'""")
+                mysql.connection.commit()
+                return redirect(url_for("order_confirmed"))
             
         elif "cancel" in request.form:
             return redirect(url_for("shopping_cart"))
 
-    return render_template("checkout.html", user=current_user, subtotal=subtotal, user_dict={
+    return render_template("checkout.html", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
         "Name": current_user.fname + " " + current_user.lname,
         "Email": current_user.email,
         "House Number": current_user.house_number,
@@ -315,7 +316,6 @@ def checkout():
         "Postal Code": current_user.postal_code,
         "Province": current_user.province,
         "City": current_user.city,
-        "Payment Method": current_user.payment_method
     })
 
 @app.route("/order_confirmed", methods=["GET", "POST"])
@@ -410,49 +410,209 @@ def goToCategory(selected_category):
 @login_required
 def orders():
     cursor = mysql.connection.cursor()
+
     cursor.execute(f"""SELECT first_name, last_name,orderid,cost,order_Time,payment_method_used 
                       FROM store_order, customer
                       WHERE customer.id = store_order.customerid AND customer.id = '{current_user.userid}'""")
+                      
     retVal = cursor.fetchall()
     cursor.close()
+    print(retVal)
     return render_template('orderHistory.jinja2', orders = retVal)
 
 @app.route('/account', methods=['GET', 'POST'])
+@login_required
 def account():
-    form = CustomerAccountForm()
+
+    # get the current user's payment methods
+    # db_connection = mysql.connection
+    # db_cursor = db_connection.cursor()
+
+    # db_cursor.execute(f'''
+    #                         SELECT payment_method
+    #                         FROM customer_payment_method
+    #                         WHERE customerid = "{current_user.userid}"
+    #                    ''')
+
+    # payment_methods = db_cursor.fetchall()
+    # db_cursor.close()
+
+    if request.method == "POST":
+        if request.form['submitbutton'] == "name":
+            return redirect(url_for("name"))
+        elif request.form['submitbutton'] == "password":
+            return redirect(url_for("password"))
+        elif request.form['submitbutton'] == "email":
+            return redirect(url_for("email"))
+        elif request.form['submitbutton'] == "address":
+            return redirect(url_for("address"))
+        elif request.form['submitbutton'] == "payment_methods":
+            return redirect(url_for("payment_methods"))
+        elif (request.form['submitbutton'] == "home"):
+            return redirect(url_for("home"))  
+    else:
+        house_number = str(current_user.house_number)
+        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
+    
+@app.route('/name', methods=['GET', 'POST'])
+@login_required
+def name():
+    form = CustomerNameForm()
 
     if form.validate_on_submit():
         db_connection = mysql.connection
         db_cursor = db_connection.cursor()
         
+        if form.first_name.data != None and form.first_name.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE customer 
+                                    SET first_name = "{form.first_name.data}" 
+                                    WHERE id = "{current_user.userid}"
+                               ''')
+        
+        if form.last_name.data != None and form.last_name.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE customer 
+                                    SET last_name = "{form.last_name.data}" 
+                                    WHERE id = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        db_cursor.close()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('name.jinja2', form = form)
+
+@app.route('/password', methods=['GET', 'POST'])
+@login_required
+def password():
+    form = PasswordForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        if form.user_password.data != None and form.user_password.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE user 
+                                    SET user_password = "{form.user_password.data}"
+                                    WHERE userid = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        db_cursor.close()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('password.jinja2', form = form)
+
+@app.route('/email', methods=['GET', 'POST'])
+@login_required
+def email():
+    form = EmailForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+        
+        if form.email.data != None and form.email.data != '':
+            db_cursor.execute(f'''
+                                    UPDATE user 
+                                    SET email = "{form.email.data}"
+                                    WHERE userid = "{current_user.userid}"
+                               ''')
+
+        db_connection.commit()
+        db_cursor.close()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('email.jinja2', form = form)
+
+@app.route('/address', methods=['GET', 'POST'])
+@login_required
+def address():
+    form = AddressForm()
+
+    if form.validate_on_submit():
+        db_connection = mysql.connection
+        db_cursor = db_connection.cursor()
+
         for field in form:
             if field.name != 'submit' and field.name != 'csrf_token' and field.data != None and field.data != '':
-                if field.name == 'first_name' or field.name == 'last_name':
-                    db_cursor.execute('''
-                                            UPDATE customer
-                                            SET {} = %s
-                                            WHERE id = 'H123'
-                                      '''.format(field.name) ,
-                                      (field.data,))
-                else:
-                    db_cursor.execute('''
-                                            UPDATE user
-                                            SET {} = %s
-                                            WHERE userid = 'H123'
-                                      '''.format(field.name) ,
-                                      (field.data,))
+                db_cursor.execute('''
+                                        UPDATE user
+                                        SET {} = %s
+                                        WHERE userid = %s
+                                  '''.format(field.name) ,
+                                  (field.data, current_user.userid))
+
+        db_connection.commit()
+        db_cursor.close()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+
+    return render_template('address.jinja2', form = form)
+
+@app.route('/payment_methods', methods=['GET', 'POST'])
+@login_required
+def payment_methods():
+    form = PaymentMethodForm()
+    
+    # get the current user's payment methods
+    db_connection = mysql.connection
+    db_cursor = db_connection.cursor()
+    payment_methods = current_user.payment_methods
+
+    # db_cursor.execute(f'''
+    #                         SELECT payment_method
+    #                         FROM customer_payment_method
+    #                         WHERE customerid = "{current_user.userid}"
+    #                    ''')
+
+    #payment_methods = db_cursor.fetchall()
+
+    # the user adds a payment method
+    if form.validate_on_submit():
+        if form.add_payment_method.data != None and form.add_payment_method.data != 'Choose a payment method':
+            db_cursor.execute(f'''
+                                    INSERT IGNORE INTO customer_payment_method
+                                    VALUES ("{current_user.userid}", "{form.add_payment_method.data}")
+                               ''')
+
+        db_connection.commit()
+        db_cursor.close()
+        flash("Changes saved!")
+        return redirect(url_for("account"))
+    
+    # the user deletes a payment method
+    elif request.method == "POST":
+        for method in payment_methods:
+            if f"delete_{method[0]}" in request.form and len(payment_methods) > 1:
+                db_connection = mysql.connection
+                db_cursor = db_connection.cursor()
+
+                db_cursor.execute(f''' 
+                                        DELETE FROM customer_payment_method
+                                        WHERE customerid = "{current_user.userid}" AND payment_method = "{method[0]}"
+                                   ''')
 
                 db_connection.commit()
-                flash(f'Changes saved!', 'success')
-    return render_template('account.html', title='Account', form=form)
+                db_cursor.close()
+                return redirect(url_for("payment_methods"))
+            # elif len(payment_methods) == 1:
+            #     flash("No products ordered!")
+            #     db_cursor.close()
+            #     return redirect(url_for("payment_methods"))
 
+    db_cursor.close()
+    return render_template('payment_method.jinja2', form = form, payment_methods = current_user.payment_methods)
 
 @app.before_request
 def initNavBar():
     topbar = Navbar(View("Home", "home"))
     nav.register_element('topbar', topbar)
-
-    
 
     if (not current_user.is_authenticated):
         topbar.items.append(View("Login", "login"))
@@ -482,9 +642,5 @@ def initNavBar():
         topbar.items.append(View("Logout", "logout"))
         topbar.items.append(View("My Account", "account"))
     
-
-    
-    
-
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)
