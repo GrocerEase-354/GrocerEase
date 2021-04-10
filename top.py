@@ -336,11 +336,6 @@ def order_confirmed():
 
     return render_template("order_confirmed.jinja2", orderID=orderID, timestamp=ts, user=current_user)
 
-@app.route("/profile")
-@login_required
-def profile():
-    return render_template("profile.jinja2", name=current_user.fname+" "+current_user.lname, user=current_user)
-
 @app.route("/logged_out")
 def logged_out():
     return render_template("logged_out.jinja2", user=current_user)
