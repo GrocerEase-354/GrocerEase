@@ -393,8 +393,8 @@ def orders():
                         WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
     retVal = cursor.fetchall()
     cursor.execute(f""" SELECT COUNT(*)
-                        FROM store_order, customer
-                        WHERE customer.id = store_order.customerid AND store_order.customerid = '{current_user.userid}'""")
+                        FROM store_order
+                        WHERE store_order.customerid = '{current_user.userid}'""")
     numOrders = cursor.fetchone()
     cursor.close()
     return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
