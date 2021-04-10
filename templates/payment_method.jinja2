@@ -2,7 +2,6 @@
 {% block content %}
 <div class="mainContent">
 
-    <style link=""></style>
     <h1>My Account</h1>
     <div class="content-section">
         <div style="width: 500px;">
@@ -21,6 +20,7 @@
                 {% endfor %}
             </table>
 
+            <br>
             <form method="POST" name="submitbutton" value="" action="{{ url_for('payment_methods') }}">
                 {{ form.hidden_tag() }}
                 <fieldset class="form-group">

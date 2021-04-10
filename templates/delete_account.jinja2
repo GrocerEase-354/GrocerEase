@@ -1,0 +1,23 @@
+{% extends "navbar.jinja2" %}
+{% block title %}
+    Delete Account
+{% endblock title %}
+
+{% block content  %}
+
+<div class="mainContent">
+
+<h1>
+    Delete Account
+</h1>
+
+<b> Are you sure you wish to delete your account? </b>
+
+<br>
+<br>
+<form method="POST"><button type="submit" name="submitbutton" value="delete_account" class="btn btn-danger">Yes, delete my account</button></form>
+
+<br>
+<form method="POST"><button type="submit" name="submitbutton" value="back_to_account" class="btn btn-warning">No, go back</button></form>
+
+{% endblock content %}
