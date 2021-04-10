@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = '10.0.2.2'
+app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
@@ -209,7 +209,7 @@ def home():
     session['user'] = user
     session['orderID'] = 999
     cursor.close()
-    return render_template("index.jinja2", user=current_user)
+    return render_template("index.jinja2", user=current_user if current_user.is_authenticated else None)
 
 @app.route("/shopping_cart", methods=["GET", "POST"])
 @login_required

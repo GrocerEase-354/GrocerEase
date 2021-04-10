@@ -7,14 +7,23 @@
 {% block content %}
 
 <div class="mainContent">
+
     <section>
         <h1>Welcome to <span class="logo-colour">GrocerEase</span></h1>
-        <h3>{{ user.fname + " " + user.lname }}'s dashboard</h1>
-        <p>Click on the navigation bar at the top to view listed items, 
-        view and edit your shopping cart, checkout, and view order history!</p>
+        {% if user %}
+            <h3>{{ user.fname + " " + user.lname }}'s dashboard</h1>
+            <p>Click on the navigation bar at the top to view listed items, 
+            view and edit your shopping cart, checkout, and view order history!</p>
 
-        <p>Also, if you wish, you can change current account data by visiting 
-        My Account, or log out of your account with the Logout button.</p>
+            <p>Also, if you wish, you can change current account data by visiting 
+            My Account, or log out of your account with the Logout button.</p>
+        {% else %}
+            <h3> Welcome, Guest </h3>
+            <p> You are not logged in! Please <a href={{url_for("login")}}> log in </a> to access features like
+                viewing listed items, shopping cart, checkout, and order history!  </p>
+            <p> Alternatively, if you didn't make an account yet, <a href={{url_for("signup")}}> sign up </a>
+                for a free account today! </p>
+        {% endif %}
     </section>
     
     <section>
