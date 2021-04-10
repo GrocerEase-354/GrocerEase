@@ -156,7 +156,7 @@ def signup_post():
         e = ' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:])
         e = ' '.join(e[e.find("'")+1:e.find("'", e.find("'")+1)].split("_"))
         flash(e.capitalize() + " must be between 1 and 100 characters!")
-        return render_template("signup.html", username=username,
+        return render_template("signup.jinja2", username=username,
                                             house_number=house_number,
                                             street_name=street_name,
                                             postal_code=postal_code,
