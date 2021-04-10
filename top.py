@@ -78,11 +78,11 @@ def load_user(user_id):
 @app.route('/login')
 def login():
     login_form = LoginForm()
-    return render_template('login.html', form=login_form)
+    return render_template('login.jinja2', form=login_form)
 
 @app.route('/signup')
 def signup():
-    return render_template('signup.html')
+    return render_template('signup.jinja2')
 
 #@auth.route('/logout')
 #def logout():
@@ -114,20 +114,6 @@ def signup_post():
     print(request.form)
     print(username, fname, lname, password, email, house_number, street_name, postal_code, province, city, payment_method)
 
-    user_obj = User(
-        userid=username,
-        password=generate_password_hash(password, method='sha256'),
-        house_number=house_number,
-        street_name=street_name,
-        postal_code=postal_code,
-        province=province,
-        city=city,
-        email=email,
-        fname=fname,
-        lname=lname,
-        payment_methods=(payment_method,)
-    )
-
     #session['user'] = user_obj
     try:
         if len(password) < 1 or len(password) > 100:
@@ -157,7 +143,7 @@ def signup_post():
     except MySQLdb.OperationalError as e:
         print(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
         flash(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
-        return render_template("signup.html", username=username,
+        return render_template("signup.jinja2", username=username,
                                             house_number=house_number,
                                             street_name=street_name,
                                             postal_code=postal_code,
@@ -212,7 +198,7 @@ def login_post():
         login_user(user2, remember=remember)
         return redirect(url_for('home'))
 
-    return render_template('login.html', form=login_form)
+    return render_template('login.jinja2', form=login_form)
 
 
 
@@ -292,7 +278,7 @@ def shopping_cart():
     print(isHealthyChoice)
     cursor.close()
 
-    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
+    return render_template("shopping_cart.jinja2", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
 
 
 @app.route("/redirect")
@@ -331,7 +317,7 @@ def checkout():
         elif "cancel" in request.form:
             return redirect(url_for("shopping_cart"))
 
-    return render_template("checkout.html", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
+    return render_template("checkout.jinja2", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
         "Name": current_user.fname + " " + current_user.lname,
         "Email": current_user.email,
         "House Number": current_user.house_number,
@@ -357,16 +343,11 @@ def order_confirmed():
         if "home" in request.form:
             return redirect(url_for("home"))
 
-    return render_template("order_confirmed.html", orderID=orderID, timestamp=ts, user=current_user)
-
-@app.route("/profile")
-@login_required
-def profile():
-    return render_template("profile.html", name=current_user.fname+" "+current_user.lname, user=current_user)
+    return render_template("order_confirmed.jinja2", orderID=orderID, timestamp=ts, user=current_user)
 
 @app.route("/logged_out")
 def logged_out():
-    return render_template("logged_out.html", user=current_user)
+    return render_template("logged_out.jinja2", user=current_user)
 
 @app.route("/categories")
 def categories():
@@ -390,13 +371,6 @@ def goToCategory(selected_category):
     cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
     cursor.close()
-    table = []
-    '''for i in retVal:
-        temp = []
-        #print(i, file=sys.stderr)
-        for j in i:
-            #print(j)
-            '''
 
     if (request.method == "POST"):
         if (request.form['submitbutton'] == "home"):
@@ -445,8 +419,9 @@ def orders():
                         WHERE customer.id = store_order.customerid AND store_order.customerid = %(current_user_userid)s""", {'current_user_userid': current_user.userid})
     retVal = cursor.fetchall()
     cursor.execute(f""" SELECT COUNT(*)
-                        FROM store_order, customer
-                        WHERE customer.id = store_order.customerid AND store_order.customerid = %(current_user_userid)s""", {'current_user_userid': current_user.userid})
+                        FROM store_order
+                        WHERE store_order.customerid = %(current_user_userid)s""", {'current_user_userid': current_user.userid})
+                        
     numOrders = cursor.fetchone()
     cursor.close()
     return render_template('orderHistory.jinja2', orders = retVal, Ordercount = numOrders)
@@ -454,20 +429,6 @@ def orders():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-
-    # get the current user's payment methods
-    # db_connection = mysql.connection
-    # db_cursor = db_connection.cursor()
-
-    # db_cursor.execute(f'''
-    #                         SELECT payment_method
-    #                         FROM customer_payment_method
-    #                         WHERE customerid = %(current_user_userid)s
-    #                    ''', {'current_user_userid': current_user.userid})
-
-    # payment_methods = db_cursor.fetchall()
-    # db_cursor.close()
-
     if request.method == "POST":
         if request.form['submitbutton'] == "name":
             return redirect(url_for("name"))
@@ -479,11 +440,13 @@ def account():
             return redirect(url_for("address"))
         elif request.form['submitbutton'] == "payment_methods":
             return redirect(url_for("payment_methods"))
-        elif (request.form['submitbutton'] == "home"):
-            return redirect(url_for("home"))  
-    else:
-        house_number = str(current_user.house_number)
-        return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
+        elif request.form['submitbutton'] == "home":
+            return redirect(url_for("home"))
+        elif request.form['submitbutton'] == "delete_account":
+            return redirect(url_for("delete_account"))
+
+    house_number = str(current_user.house_number)
+    return render_template('account.jinja2', user = current_user, house_number = house_number, payment_methods = current_user.payment_methods)
     
 @app.route('/name', methods=['GET', 'POST'])
 @login_required
@@ -596,14 +559,6 @@ def payment_methods():
     db_cursor = db_connection.cursor()
     payment_methods = current_user.payment_methods
 
-    # db_cursor.execute(f'''
-    #                         SELECT payment_method
-    #                         FROM customer_payment_method
-    #                         WHERE customerid = %(current_user_userid)s
-    #                    ''', {'current_user_userid': current_user.userid})
-
-    #payment_methods = db_cursor.fetchall()
-
     # the user adds a payment method
     if form.validate_on_submit():
         if form.add_payment_method.data != None and form.add_payment_method.data != 'Choose a payment method':
@@ -632,13 +587,32 @@ def payment_methods():
                 db_connection.commit()
                 db_cursor.close()
                 return redirect(url_for("payment_methods"))
-            # elif len(payment_methods) == 1:
-            #     flash("No products ordered!")
-            #     db_cursor.close()
-            #     return redirect(url_for("payment_methods"))
 
     db_cursor.close()
     return render_template('payment_method.jinja2', form = form, payment_methods = current_user.payment_methods)
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    if request.method == "POST":
+        if request.form['submitbutton'] == "delete_account":
+            current_user_id = current_user.userid
+            logout_user()
+            db_connection = mysql.connection
+            db_cursor = db_connection.cursor()
+
+            db_cursor.execute(f'''
+                                    DELETE FROM user
+                                    WHERE userid = %(parameterId)s
+                               ''', {'parameterId': current_user_id})
+
+            db_connection.commit()
+            db_cursor.close()
+            return redirect(url_for("logged_out"))
+        elif request.form['submitbutton'] == "back_to_account":
+            return redirect(url_for("account"))
+
+    return render_template('delete_account.jinja2')
 
 @app.before_request
 def initNavBar():

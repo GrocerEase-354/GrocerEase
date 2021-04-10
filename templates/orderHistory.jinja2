@@ -1,10 +1,11 @@
 {% extends 'navbar.jinja2' %} 
 
 {% block title %} 
-<title>Orders Page</title>
+Orders Page
 {% endblock %}
 
 {% block content %} 
+<div class="mainContent">
 
     <h1>Transaction History</h1>
     <p>Number of Transactions: {{ Ordercount[0] }}</p>
@@ -28,5 +29,5 @@
     {%endfor%}
     </table>
 
-
+</div>
 {%endblock%}

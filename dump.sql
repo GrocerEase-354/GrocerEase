@@ -275,6 +275,20 @@ THEN
     SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Quantity cannot be less than zero!';
 END IF;$$
+
+CREATE TRIGGER `customer_payment_method_insert_constraints` BEFORE INSERT ON `customer_payment_method`
+FOR EACH ROW IF LENGTH(NEW.payment_method) <= 0 
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment method cannot be empty!';
+END IF;$$
+
+CREATE TRIGGER `customer_payment_method_update_constraints` BEFORE UPDATE ON `customer_payment_method`
+FOR EACH ROW IF LENGTH(NEW.payment_method) <= 0
+THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment method cannot be empty!';
+END IF;$$
 DELIMITER ;
 
 /*Populating the tables with tuples*/
