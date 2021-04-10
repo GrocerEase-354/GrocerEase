@@ -497,14 +497,14 @@ def name():
         if form.first_name.data != None and form.first_name.data != '':
             db_cursor.execute(f'''
                                     UPDATE customer 
-                                    SET first_name = %(form_first_name_data)s" 
+                                    SET first_name = %(form_first_name_data)s 
                                     WHERE id = %(current_user_userid)s
                                ''', {'current_user_userid': current_user.userid, 'form_first_name_data': form.first_name.data})
         
         if form.last_name.data != None and form.last_name.data != '':
             db_cursor.execute(f'''
                                     UPDATE customer 
-                                    SET last_name = %(form_last_name_data)s" 
+                                    SET last_name = %(form_last_name_data)s 
                                     WHERE id = %(current_user_userid)s
                                ''', {'current_user_userid': current_user.userid, 'form_last_name_data': form.last_name.data})
 
