@@ -320,11 +320,11 @@ def checkout():
                 subtotal = session['subtotal']
 
                 cursor.execute(f"""INSERT INTO store_order (`customerid`, `cost`, `order_time`, `payment_method_used`)
-                                VALUES (%(user_id)s, {subtotal*1.12}, '{ts}', '{payment_method}')""", {'user_id': user.user_id})
+                                VALUES (%(user_id)s, {subtotal*1.12}, '{ts}', '{payment_method}')""", {'user_id': current_user.userid})
                 mysql.connection.commit()
 
                 cursor.execute(f"""DELETE FROM product_in_shopping_cart
-                                WHERE customerid=%(user_id)s""", {'user_id': user.user_id})
+                                WHERE customerid=%(user_id)s""", {'user_id': current_user.userid})
                 mysql.connection.commit()
                 return redirect(url_for("order_confirmed"))
             
