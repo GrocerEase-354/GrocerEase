@@ -114,20 +114,6 @@ def signup_post():
     print(request.form)
     print(username, fname, lname, password, email, house_number, street_name, postal_code, province, city, payment_method)
 
-    user_obj = User(
-        userid=username,
-        password=generate_password_hash(password, method='sha256'),
-        house_number=house_number,
-        street_name=street_name,
-        postal_code=postal_code,
-        province=province,
-        city=city,
-        email=email,
-        fname=fname,
-        lname=lname,
-        payment_methods=(payment_method,)
-    )
-
     #session['user'] = user_obj
     try:
         # add user to DB
@@ -362,13 +348,6 @@ def goToCategory(selected_category):
     cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
     cursor.close()
-    table = []
-    '''for i in retVal:
-        temp = []
-        #print(i, file=sys.stderr)
-        for j in i:
-            #print(j)
-            '''
 
     if (request.method == "POST"):
         if (request.form['submitbutton'] == "home"):
