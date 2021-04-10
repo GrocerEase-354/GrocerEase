@@ -78,11 +78,11 @@ def load_user(user_id):
 @app.route('/login')
 def login():
     login_form = LoginForm()
-    return render_template('login.html', form=login_form)
+    return render_template('login.jinja2', form=login_form)
 
 @app.route('/signup')
 def signup():
-    return render_template('signup.html')
+    return render_template('signup.jinja2')
 
 #@auth.route('/logout')
 #def logout():
@@ -114,20 +114,6 @@ def signup_post():
     print(request.form)
     print(username, fname, lname, password, email, house_number, street_name, postal_code, province, city, payment_method)
 
-    user_obj = User(
-        userid=username,
-        password=generate_password_hash(password, method='sha256'),
-        house_number=house_number,
-        street_name=street_name,
-        postal_code=postal_code,
-        province=province,
-        city=city,
-        email=email,
-        fname=fname,
-        lname=lname,
-        payment_methods=(payment_method,)
-    )
-
     #session['user'] = user_obj
     try:
         if len(password) < 1 or len(password) > 100:
@@ -150,7 +136,7 @@ def signup_post():
     except MySQLdb.OperationalError as e:
         print(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
         flash(' '.join([e2.strip(" )\"\'(") for e2 in str(e).split(',')][1:]))
-        return render_template("signup.html", username=username,
+        return render_template("signup.jinja2", username=username,
                                             house_number=house_number,
                                             street_name=street_name,
                                             postal_code=postal_code,
@@ -193,7 +179,7 @@ def login_post():
         login_user(user2, remember=remember)
         return redirect(url_for('home'))
 
-    return render_template('login.html', form=login_form)
+    return render_template('login.jinja2', form=login_form)
 
 
 
@@ -273,7 +259,7 @@ def shopping_cart():
     print(isHealthyChoice)
     cursor.close()
 
-    return render_template("shopping_cart.html", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
+    return render_template("shopping_cart.jinja2", items=products, subtotal=subtotal, user=current_user, isHealthyChoice=isHealthyChoice)
 
 
 @app.route("/redirect")
@@ -312,7 +298,7 @@ def checkout():
         elif "cancel" in request.form:
             return redirect(url_for("shopping_cart"))
 
-    return render_template("checkout.html", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
+    return render_template("checkout.jinja2", user=current_user, subtotal=subtotal, payment_methods = current_user.payment_methods, user_dict={
         "Name": current_user.fname + " " + current_user.lname,
         "Email": current_user.email,
         "House Number": current_user.house_number,
@@ -338,16 +324,11 @@ def order_confirmed():
         if "home" in request.form:
             return redirect(url_for("home"))
 
-    return render_template("order_confirmed.html", orderID=orderID, timestamp=ts, user=current_user)
-
-@app.route("/profile")
-@login_required
-def profile():
-    return render_template("profile.html", name=current_user.fname+" "+current_user.lname, user=current_user)
+    return render_template("order_confirmed.jinja2", orderID=orderID, timestamp=ts, user=current_user)
 
 @app.route("/logged_out")
 def logged_out():
-    return render_template("logged_out.html", user=current_user)
+    return render_template("logged_out.jinja2", user=current_user)
 
 @app.route("/categories")
 def categories():
@@ -371,13 +352,6 @@ def goToCategory(selected_category):
     cursor.execute(f"SELECT { productsToSelect } FROM product WHERE LOWER(category_name) LIKE %(parameterInput)s", {'parameterInput': actualSelectedCategory})
     retVal = cursor.fetchall()
     cursor.close()
-    table = []
-    '''for i in retVal:
-        temp = []
-        #print(i, file=sys.stderr)
-        for j in i:
-            #print(j)
-            '''
 
     if (request.method == "POST"):
         if (request.form['submitbutton'] == "home"):
