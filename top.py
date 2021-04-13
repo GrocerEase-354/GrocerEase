@@ -341,8 +341,11 @@ def order_confirmed():
 def logged_out():
     return render_template("logged_out.jinja2", user=current_user)
 
-@app.route("/categories")
+@app.route("/categories", methods=['GET', 'POST'])
 def categories():
+    if request.method == "POST":
+        if "submitbutton" in request.form:
+            return redirect(url_for("home"))
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT category_name, COUNT(*) FROM product GROUP BY category_name")
     retVal = cursor.fetchall()
