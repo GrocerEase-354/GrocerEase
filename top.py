@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = '10.0.2.2'
+app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
