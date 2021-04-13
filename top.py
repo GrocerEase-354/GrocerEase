@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = '10.0.2.2'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'cmpt354'
@@ -509,12 +509,12 @@ def email():
         if form.email.data != None and form.email.data != '':
             db_cursor.execute(f'''
                                     UPDATE user 
-                                    SET email = %(form_email_data)s"
+                                    SET email = %(form_email_data)s
                                     WHERE userid = %(current_user_userid)s
                                ''', {'form_email_data': form.email.data, 'current_user_userid': current_user.userid})
 
-        db_connection.commit()
-        db_cursor.close()
+            db_connection.commit()
+            db_cursor.close()
         flash("Changes saved!")
         return redirect(url_for("account"))
 
