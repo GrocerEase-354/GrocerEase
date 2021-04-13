@@ -21,5 +21,5 @@ Y123 | Y123
 Our implementation demo video is available at the following link: https://www.youtube.com/watch?v=RWnEtEzcuxQ
 
 ### Application Demo ###
-Our application demo video is available at the following link: https://www.youtube.com/watch?v=Iq0HX8gUbwY
+Our application demo video is available at the following link: https://www.youtube.com/watch?v=xqoePmk6ymU
 
