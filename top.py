@@ -603,11 +603,15 @@ def delete_account():
 
             db_connection.commit()
             db_cursor.close()
-            return redirect(url_for("logged_out"))
+            return redirect(url_for("account_deleted"))
         elif request.form['submitbutton'] == "back_to_account":
             return redirect(url_for("account"))
 
     return render_template('delete_account.jinja2')
+
+@app.route("/account_deleted")
+def account_deleted():
+    return render_template("account_deleted.jinja2", user=current_user)
 
 @app.before_request
 def initNavBar():
