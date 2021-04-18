@@ -1,4 +1,4 @@
-# 354Project
+# GrocerEase
 
 ## Instructions ##
 * Run `pip install -r requirements.txt` to install all dependencies.
